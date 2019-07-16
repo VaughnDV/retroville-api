@@ -12,4 +12,3 @@ class UserReadStorySerializer(serializers.HyperlinkedModelSerializer):
     class Meta:
         model = UserReadStory
         fields = ("id", "url", "user", "story", "interested")
-
