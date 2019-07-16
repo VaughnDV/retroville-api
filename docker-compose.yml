@@ -12,6 +12,7 @@ services:
       - API_KEY_SECRET=VXCIvNyRhOf1I3ipd1u8SwiXBfJe48NB
       - APP_SID=APe42149306b5831c329fbc5419ff861c3
       - DEBUG=True
+
     image: web
     build: ./
     command: >

@@ -6,6 +6,7 @@ from django.views.generic.base import RedirectView
 from rest_framework.routers import DefaultRouter
 from rest_framework.authtoken import views
 from .users.views import UserViewSet, UserCreateViewSet
+<<<<<<< HEAD
 from .stories.views import StoryViewSet, UserReadStoryViewSet
 from .voice.views import token
 from .voice.views import incoming
