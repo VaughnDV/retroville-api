@@ -1,30 +1,25 @@
 sudo: required
 language: python
 services:
-  - docker
+- docker
 python:
-  - "3.6"
+- '3.6'
 before_script:
-  - docker-compose build
+- docker-compose build
 script:
-  - docker-compose run --rm web bash -c "flake8 . &&
-                                         python wait_for_postgres.py &&
-                                         ./manage.py test"
-
+- docker-compose run --rm web bash -c "flake8 . && python wait_for_postgres.py &&
+  ./manage.py test"
 after_success:
-  - if [ "$TRAVIS_BRANCH" == "master" ]; then
-    docker login --username=_ --password="$HEROKU_AUTH_TOKEN" registry.heroku.com;
-    docker tag web registry.heroku.com/retroville-prod/web;
-    docker push registry.heroku.com/retroville-prod/web;
-    fi
-  - if [ "$TRAVIS_BRANCH" == "qa" ]; then
-    docker login --username=_ --password="$HEROKU_AUTH_TOKEN" registry.heroku.com;
-    docker tag web registry.heroku.com/retroville-qa/web;
-    docker push registry.heroku.com/retroville-qa/web;
-    fi
-
+- if [ "$TRAVIS_BRANCH" == "master" ]; then docker login --username=_ --password="$HEROKU_AUTH_TOKEN"
+  registry.heroku.com; docker tag web registry.heroku.com/retroville-prod/web; docker
+  push registry.heroku.com/retroville-prod/web; fi
+- if [ "$TRAVIS_BRANCH" == "qa" ]; then docker login --username=_ --password="$HEROKU_AUTH_TOKEN"
+  registry.heroku.com; docker tag web registry.heroku.com/retroville-qa/web; docker
+  push registry.heroku.com/retroville-qa/web; fi
 notifications:
   email: false
-
 cache:
   pip: true
+env:
+  global:
+    secure: KZeIU//7wNqc7TVJukggM4x59t61Ya3LBJ2lbnv+2d0kt8gM9VV8gr/zsjTxDpD6XsiycSwkmn/m7G0zHyqvb1LK0I0Pf1Bxk4tZmrtnqfyxJRG8VLdn7V3rh+5n7+moBWjWVYa5bheZeOrKyWFHAHlcTeBVpaMWgbcN/lav/q2rZEnGMwaUUiuAGwOI7uHDRN5SFVd80lpx1gahBPt61S31IemypzdHk+xt9hpBBOUvKBLpfR6iA99nqK64x9V/F5oaB81sAFqnqokDlptxYXgD+OGyXEbJrMlM7waZmbAx4JXNqXAYDv2MXHqkLqmkaUnfJkM4DjOBGEd88NDx89ZFI1oDxmlL4HNw68EATvYpIriyqApRb1XSW7Qt7Z4bQxqQzmdAv+bFxUkY2IGFyVKtq2/Zwwg9Wi3LBkENWb2hXymWp10622UY4Gq5eqA9IJmBidp5cIj4juhulW45Ae+bV8mr41Ah1zqWKpmxbnSNHhjK+IGeeA46GP2T1v0tlSCKhEfqXZSH2cucCvRLLXErFqS4U0GQpuguptXcPdUw/S/QzcLJv6/pW6iNw7F0vyW5wsm/QbYnp117EZqc8jrGVUJKjAvnYnL/ci9tuphME0lyAQg1iPJcOAe4t02PqbyiiSTmtsMVVMaXWJ7Bz8ewJloDj5bl8OVfqAVua0U=
