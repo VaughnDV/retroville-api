@@ -1,0 +1,34 @@
+version: '2'
+
+services:
+  postgres:
+    image: postgres:9.6
+  web:
+    restart: always
+    environment:
+      - DJANGO_SECRET_KEY=local
+      - ACCOUNT_SID=ACc48e90f3330049e8b8c2d6310799a54f
+      - API_KEY=SKdfc0811aee5d74f3089fcb168399c356
+      - API_KEY_SECRET=VXCIvNyRhOf1I3ipd1u8SwiXBfJe48NB
+      - APP_SID=APe42149306b5831c329fbc5419ff861c3
+      - DEBUG=True
+    image: web
+    build: ./
+    command: >
+      bash -c "python wait_for_postgres.py &&
+               ./manage.py migrate &&
+               ./manage.py runserver 0.0.0.0:8000"
+    volumes:
+      - ./:/code
+    ports:
+      - "8000:8000"
+    depends_on:
+      - postgres
+  documentation:
+    restart: always
+    build: ./
+    command: "mkdocs serve"
+    volumes:
+      - ./:/code
+    ports:
+      - "8001:8001"
