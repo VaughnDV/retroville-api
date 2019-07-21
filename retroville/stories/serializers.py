@@ -5,10 +5,14 @@ from .models import Story, UserReadStory
 class StorySerializer(serializers.HyperlinkedModelSerializer):
     class Meta:
         model = Story
-        fields = ("id", "url", "users", "title", "content", "picture_url")
+        fields = ("id", "url", "users", "title", "content", "picture_url", "live_date")
 
 
 class UserReadStorySerializer(serializers.HyperlinkedModelSerializer):
     class Meta:
         model = UserReadStory
         fields = ("id", "url", "user", "story", "interested")
+
+
+
+
