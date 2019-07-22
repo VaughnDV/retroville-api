@@ -1,5 +1,5 @@
 from rest_framework import viewsets, mixins
-from rest_framework.permissions import AllowAny
+from rest_framework.permissions import AllowAny, IsAuthenticated
 from .models import User
 
 from .permissions import IsUserOrReadOnly
@@ -15,7 +15,7 @@ class UserViewSet(
 
     queryset = User.objects.all()
     serializer_class = UserSerializer
-    permission_classes = (IsUserOrReadOnly,)
+    permission_classes = (IsAuthenticated,)
 
 
 class UserCreateViewSet(mixins.CreateModelMixin, viewsets.GenericViewSet):

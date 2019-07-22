@@ -4,11 +4,11 @@ from .models import Story, UserReadStory
 
 @admin.register(Story)
 class StoryAdmin(admin.ModelAdmin):
-    fields = ["title", "content", "picture_url"]
-    list_display = ["title", "content"]
-    ordering = ["created_at"]
-    list_filter = ["created_at", "title"]
-    search_fields = ["content", "title"]
+    fields = ["title", "content", "picture_url", "live_date"]
+    list_display = ["title", "content", "live_date"]
+    ordering = ["live_date", "created_at"]
+    list_filter = ["created_at", "title", "live_date"]
+    search_fields = ["content", "title", "live_date"]
 
 
 @admin.register(UserReadStory)
