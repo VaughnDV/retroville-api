@@ -2,20 +2,6 @@ from django.db import models
 from django.utils import timezone
 from django.conf import settings
 
-"""
-
-Sotries:
-
-will return stories for date provided
-
-FIELDS
-title
-content
-picture_url
-created_at
-is_read() to  see if user has read 
-"""
-
 
 class Story(models.Model):
     id = models.AutoField(primary_key=True)
@@ -32,10 +18,6 @@ class Story(models.Model):
             self.created_at = timezone.now()
         self.modified_at = timezone.now()
         return super(Story, self).save(*args, **kwargs)
-
-    @property
-    def find_stories(self):
-        return "TODO"
 
     def __str__(self):
         return self.title
