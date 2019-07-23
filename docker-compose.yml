@@ -11,6 +11,7 @@ services:
       - API_KEY=SKdfc0811aee5d74f3089fcb168399c356
       - API_KEY_SECRET=VXCIvNyRhOf1I3ipd1u8SwiXBfJe48NB
       - APP_SID=APe42149306b5831c329fbc5419ff861c3
+      - REDIS_URI=redis://redis:6379
       - DEBUG=True
 
     image: web
@@ -25,6 +26,8 @@ services:
       - "8000:8000"
     depends_on:
       - postgres
+    links:
+      - redis:redis
   documentation:
     restart: always
     build: ./
@@ -33,3 +36,8 @@ services:
       - ./:/code
     ports:
       - "8001:8001"
+  redis:
+    restart: always
+    image: redis:latest
+    expose:
+      - "6379"

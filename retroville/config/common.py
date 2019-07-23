@@ -29,6 +29,7 @@ class Common(Configuration):
         'retroville.users',
         'retroville.stories',
         'retroville.voice',
+        'retroville.matching_room',
     )
 
     # https://docs.djangoproject.com/en/2.0/topics/http/middleware/
@@ -206,4 +207,14 @@ class Common(Configuration):
             'rest_framework.authentication.SessionAuthentication',
             'rest_framework.authentication.TokenAuthentication',
         )
+    }
+
+    CACHES = {
+        "default": {
+            "BACKEND": "django_redis.cache.RedisCache",
+            "LOCATION": "redis://redis:6379/0",
+            "OPTIONS": {
+                "CLIENT_CLASS": "django_redis.client.DefaultClient",
+            }
+        }
     }
