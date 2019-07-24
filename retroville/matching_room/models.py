@@ -8,6 +8,7 @@ class MatchingRoom(models.Model):
     STATES = [
         ('ONLINE', 'online'),
         ('LOOKING', 'looking_for_match'),
+        ('WAITING', 'waiting_for_match'),
         ('MATCHED', 'matched'),
         ('OFFLINE', 'offline'),
     ]
@@ -16,11 +17,7 @@ class MatchingRoom(models.Model):
         ('RECEIVER', 'receiver'),
     ]
 
-    user = models.OneToOneField(
-        settings.AUTH_USER_MODEL,
-        on_delete=models.CASCADE,
-        primary_key=True,
-    )
+    user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
     access_token = models.CharField(max_length=256)
     state = models.CharField(max_length=24, choices=STATES, default="OFFLINE")
     role = models.CharField(max_length=24, choices=ROLES, default=None)
@@ -36,5 +33,3 @@ class MatchingRoom(models.Model):
 
     def __str__(self):
         return self.state
-
-
