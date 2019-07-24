@@ -5,13 +5,13 @@ from nose.tools import ok_, eq_
 from rest_framework.test import APITestCase
 from rest_framework import status
 from faker import Faker
-from ..models import User
-from .factories import UserFactory
+from ..models import Story
+from .factories import StoryFactory
 
 fake = Faker()
 
 
-class TestUserListTestCase(APITestCase):
+class TestStoryTestCase(APITestCase):
     """
     Tests /users list operations.
     """
@@ -19,7 +19,7 @@ class TestUserListTestCase(APITestCase):
     def setUp(self):
 
         self.url = reverse("user-list")
-        self.user_data = model_to_dict(UserFactory.build())
+        self.user_data = model_to_dict(StoryFactory.build())
 
     def test_post_request_with_no_data_fails(self):
         response = self.client.post(self.url, {})

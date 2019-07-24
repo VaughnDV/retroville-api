@@ -9,43 +9,49 @@ class Migration(migrations.Migration):
 
     dependencies = [
         migrations.swappable_dependency(settings.AUTH_USER_MODEL),
-        ('stories', '0001_initial'),
+        ("stories", "0001_initial"),
     ]
 
     operations = [
         migrations.CreateModel(
-            name='UserReadStory',
+            name="UserReadStory",
             fields=[
-                ('id', models.AutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('created_at', models.DateField(editable=False)),
-                ('interested', models.BooleanField()),
-                ('modified_at', models.DateTimeField()),
+                (
+                    "id",
+                    models.AutoField(
+                        auto_created=True,
+                        primary_key=True,
+                        serialize=False,
+                        verbose_name="ID",
+                    ),
+                ),
+                ("created_at", models.DateField(editable=False)),
+                ("interested", models.BooleanField()),
+                ("modified_at", models.DateTimeField()),
             ],
         ),
-        migrations.RemoveField(
-            model_name='userreadstories',
-            name='story',
-        ),
-        migrations.RemoveField(
-            model_name='userreadstories',
-            name='user',
-        ),
+        migrations.RemoveField(model_name="userreadstories", name="story"),
+        migrations.RemoveField(model_name="userreadstories", name="user"),
         migrations.AlterField(
-            model_name='story',
-            name='users',
-            field=models.ManyToManyField(through='stories.UserReadStory', to=settings.AUTH_USER_MODEL),
+            model_name="story",
+            name="users",
+            field=models.ManyToManyField(
+                through="stories.UserReadStory", to=settings.AUTH_USER_MODEL
+            ),
         ),
-        migrations.DeleteModel(
-            name='UserReadStories',
+        migrations.DeleteModel(name="UserReadStories"),
+        migrations.AddField(
+            model_name="userreadstory",
+            name="story",
+            field=models.ForeignKey(
+                on_delete=django.db.models.deletion.CASCADE, to="stories.Story"
+            ),
         ),
         migrations.AddField(
-            model_name='userreadstory',
-            name='story',
-            field=models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to='stories.Story'),
-        ),
-        migrations.AddField(
-            model_name='userreadstory',
-            name='user',
-            field=models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to=settings.AUTH_USER_MODEL),
+            model_name="userreadstory",
+            name="user",
+            field=models.ForeignKey(
+                on_delete=django.db.models.deletion.CASCADE, to=settings.AUTH_USER_MODEL
+            ),
         ),
     ]

@@ -10,6 +10,7 @@ class Story(models.Model):
     picture_url = models.CharField(max_length=100)
     created_at = models.DateTimeField(editable=False)
     modified_at = models.DateTimeField()
+    live_date = models.DateField(default=None)
     users = models.ManyToManyField(settings.AUTH_USER_MODEL, through="UserReadStory")
 
     def save(self, *args, **kwargs):
