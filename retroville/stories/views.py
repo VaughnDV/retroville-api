@@ -1,28 +1,30 @@
-from rest_framework import viewsets, mixins
-from rest_framework.permissions import IsAdminUser
-from rest_framework.permissions import AllowAny
+from rest_framework import viewsets
 from .models import Story
 from .models import UserReadStory
-from retroville.permissions import IsUserOrReadOnly, IsAdminUserOrReadOnly
 from .serializers import StorySerializer
 from .serializers import UserReadStorySerializer
+from django_filters.rest_framework import DjangoFilterBackend
+from rest_framework.permissions import IsAuthenticated
+# from retroville.permissions import IsUserOrReadOnly, IsAdminUserOrReadOnly
 
 
 class StoryViewSet(viewsets.ModelViewSet):
     """
-    Updates and retrieves user accounts
+    List all and fetch one
     """
 
     queryset = Story.objects.all()
     serializer_class = StorySerializer
-    permission_classes = (IsAdminUserOrReadOnly,)
+    permission_classes = (IsAuthenticated,)
+
+    filter_backends = [DjangoFilterBackend]
+    filterset_fields = ['live_date', 'users']
 
 
 class UserReadStoryViewSet(viewsets.ModelViewSet):
     """
-    Creates user accounts
     """
 
     queryset = UserReadStory.objects.all()
     serializer_class = UserReadStorySerializer
-    permission_classes = (IsUserOrReadOnly,)
+    permission_classes = (IsAuthenticated,)

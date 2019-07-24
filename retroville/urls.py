@@ -18,15 +18,13 @@ router = DefaultRouter()
 router.register(r"users", UserViewSet)
 router.register(r"users", UserCreateViewSet)
 router.register(r"stories", StoryViewSet)
-router.register(r"read", UserReadStoryViewSet)
+router.register(r"stories/read", UserReadStoryViewSet)
 
 urlpatterns = [
     path("admin/", admin.site.urls),
     path("api/v1/", include(router.urls)),
     path("api-token-auth/", views.obtain_auth_token),
     path("api-auth/", include("rest_framework.urls", namespace="rest_framework")),
-    # the 'api-root' from django rest-frameworks default router
-    # http://www.django-rest-framework.org/api-guide/routers/#defaultrouter
     re_path(r"^$", RedirectView.as_view(url=reverse_lazy("api-root"), permanent=False)),
     path("accessToken/", token, name="token"),
     path("placeCall/", placeCall, name="placeCall"),
