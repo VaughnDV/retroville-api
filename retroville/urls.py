@@ -12,7 +12,11 @@ from .voice.views import incoming
 from .voice.views import makeCall
 from .voice.views import placeCall
 from .voice.views import ping
+from .matching_room.views import room
 
+admin.site.site_header = 'Retroville'
+admin.site.site_title = 'Retroville Admin Panel'
+admin.site.index_title = 'Retroville'
 
 router = DefaultRouter()
 router.register(r"users", UserViewSet)
@@ -31,4 +35,5 @@ urlpatterns = [
     path("incoming/", incoming, name="incoming"),
     path("makeCall/", makeCall, name="makeCall"),
     path("ping/", ping, name="ping"),
+    path("room/", room, name="room")
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

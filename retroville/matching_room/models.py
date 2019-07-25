@@ -13,6 +13,7 @@ class MatchingRoom(models.Model):
         ('OFFLINE', 'offline'),
     ]
     ROLES = [
+        ('UNASSIGNED', 'unassigned'),
         ('CALLER', 'caller'),
         ('RECEIVER', 'receiver'),
     ]

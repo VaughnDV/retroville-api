@@ -5,15 +5,17 @@ from .models import MatchingRoom
 from .serializers import MatchingRoomSerializer
 from django.utils import timezone
 from datetime import timedelta, datetime
+from django.shortcuts import render
+from django.contrib.auth.decorators import login_required
 
 
 @csrf_exempt
-def snippet_detail(request, pk):
+def room_detail(request, pk):
     """
     Retrieve, update or delete a code snippet.
     """
     try:
-        sapien = MatchingRoom.objects.get(pk=pk, modified_attimezone.now()-timedelta)
+        sapien = MatchingRoom.objects.get(pk=pk, modified_at__gt=timezone.now()-timedelta(hours=24))
     except MatchingRoom.DoesNotExist:
         return HttpResponse(status=404)
 
@@ -32,3 +34,18 @@ def snippet_detail(request, pk):
     elif request.method == 'DELETE':
         sapien.delete()
         return HttpResponse(status=204)
+
+
+@login_required
+def room(request):
+    """
+    Root page view. This is essentially a single-page app, if you ignore the
+    login and admin parts.
+    """
+    # Get a list of rooms, ordered alphabetically
+    sapiens = MatchingRoom.objects.filter(modified_at__gt=timezone.now()-timedelta(hours=24))
+
+    # Render that in the index template
+    return render(request, "index.html", {
+        "sapiens": sapiens,
+    })
