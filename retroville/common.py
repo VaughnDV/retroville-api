@@ -11,6 +11,8 @@ BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 class Common(Configuration):
 
     INSTALLED_APPS = (
+        'channels',
+        'retroville.config.suit.SuitConfig',
         "django.contrib.admin",
         "django.contrib.auth",
         "django.contrib.contenttypes",
@@ -43,6 +45,7 @@ class Common(Configuration):
     ROOT_URLCONF = "retroville.urls"
     SECRET_KEY = os.getenv("DJANGO_SECRET_KEY")
     WSGI_APPLICATION = "retroville.wsgi.application"
+    ASGI_APPLICATION = "retroville.routing.application"
 
     # Email
     EMAIL_BACKEND = "django.core.mail.backends.smtp.EmailBackend"
@@ -87,7 +90,10 @@ class Common(Configuration):
     TEMPLATES = [
         {
             "BACKEND": "django.template.backends.django.DjangoTemplates",
-            "DIRS": STATICFILES_DIRS,
+            # "DIRS": STATICFILES_DIRS,
+            'DIRS': [
+                os.path.join(BASE_DIR, 'templates'),
+            ],
             "APP_DIRS": True,
             "OPTIONS": {
                 "context_processors": [
@@ -99,6 +105,10 @@ class Common(Configuration):
             },
         }
     ]
+
+    TEMPLATE_DIRS = (
+        os.path.join(BASE_DIR, 'retroville/templates'),
+    )
 
     # Set DEBUG to False as a default for safety
     # https://docs.djangoproject.com/en/dev/ref/settings/#debug
@@ -190,5 +200,15 @@ class Common(Configuration):
             "OPTIONS": {
                 "CLIENT_CLASS": "django_redis.client.DefaultClient",
             }
+        }
+    }
+
+    CHANNEL_LAYERS = {
+        'default': {
+            'BACKEND': 'asgi_redis.RedisChannelLayer',
+            'CONFIG': {
+                'hosts': [('localhost', 6379)],
+            },
+            'ROUTING': 'example_channels.routing.channel_routing',
         }
     }
