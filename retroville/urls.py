@@ -13,6 +13,7 @@ from .voice.views import makeCall
 from .voice.views import placeCall
 from .voice.views import ping
 from .matching_room.views import room
+from .chat.views import index, room
 
 admin.site.site_header = 'Retroville'
 admin.site.site_title = 'Retroville Admin Panel'
@@ -35,5 +36,7 @@ urlpatterns = [
     path("incoming/", incoming, name="incoming"),
     path("makeCall/", makeCall, name="makeCall"),
     path("ping/", ping, name="ping"),
-    path("room/", room, name="room")
+    # path("room/", room, name="room"),
+    path("chat/", index, name="chat"),
+    path('chat/<str:room_name>/', room, name='room'),
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
