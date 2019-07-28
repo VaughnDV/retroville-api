@@ -167,3 +167,5 @@ asgi_redis
 djangochannelsrestframework
 pytest-django
 pytest-asyncio
+channels_redis
+daphne==2.2.5

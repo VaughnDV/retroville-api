@@ -12,6 +12,7 @@ class Common(Configuration):
 
     INSTALLED_APPS = (
         'channels',
+        'retroville.chat',
         'retroville.config.suit.SuitConfig',
         "django.contrib.admin",
         "django.contrib.auth",
@@ -205,10 +206,9 @@ class Common(Configuration):
 
     CHANNEL_LAYERS = {
         'default': {
-            'BACKEND': 'asgi_redis.RedisChannelLayer',
+            'BACKEND': 'channels_redis.core.RedisChannelLayer',
             'CONFIG': {
-                'hosts': [('localhost', 6379)],
+                "hosts": [('redis', 6379)],
             },
-            'ROUTING': 'example_channels.routing.channel_routing',
-        }
+        },
     }
