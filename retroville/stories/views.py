@@ -28,3 +28,4 @@ class UserReadStoryViewSet(viewsets.ModelViewSet):
     queryset = UserReadStory.objects.all()
     serializer_class = UserReadStorySerializer
     permission_classes = (IsAuthenticated,)
+    filterset_fields = ['stories', 'users', 'interested']
