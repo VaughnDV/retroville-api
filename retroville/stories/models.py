@@ -5,9 +5,9 @@ from django.conf import settings
 
 class Story(models.Model):
     id = models.AutoField(primary_key=True)
-    title = models.CharField(max_length=30)
-    content = models.CharField(max_length=2000)
-    picture_url = models.CharField(max_length=100)
+    title = models.CharField(max_length=512)
+    content = models.CharField(max_length=2048)
+    picture_url = models.CharField(max_length=512)
     created_at = models.DateTimeField(editable=False)
     modified_at = models.DateTimeField()
     live_date = models.DateField(default=None)
