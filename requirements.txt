@@ -164,8 +164,7 @@ django-redis==4.*
 https://github.com/darklow/django-suit/tarball/v2
 channels
 asgi_redis
+channels_redis
 djangochannelsrestframework
 pytest-django
 pytest-asyncio
-channels_redis
-daphne==2.2.5

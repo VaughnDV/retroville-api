@@ -5,7 +5,6 @@ from .serializers import StorySerializer
 from .serializers import UserReadStorySerializer
 from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework.permissions import IsAuthenticated
-# from retroville.permissions import IsUserOrReadOnly, IsAdminUserOrReadOnly
 
 
 class StoryViewSet(viewsets.ModelViewSet):
@@ -16,7 +15,6 @@ class StoryViewSet(viewsets.ModelViewSet):
     queryset = Story.objects.all()
     serializer_class = StorySerializer
     permission_classes = (IsAuthenticated,)
-
     filter_backends = [DjangoFilterBackend]
     filterset_fields = ['live_date', 'users']
 
