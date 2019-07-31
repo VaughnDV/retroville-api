@@ -33,4 +33,12 @@ class MatchViewSet(viewsets.ModelViewSet):
     filterset_fields = ('caller', 'receiver',)
 
     def get_queryset(self):
+
+        """HERE GOES THE LOGIC"""
+        # Check if user in Match table
+        #     If yes: return
+        #     If no: check if user in room table
+        #         If no: Start worker
+        #         If yes: return {"data": "Waiting (or whatever)"}
+
         return Match.objects.filter(Q(caller=self.request.user) | Q(receiver=self.request.user))
