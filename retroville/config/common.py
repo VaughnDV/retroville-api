@@ -28,7 +28,7 @@ class Common(Configuration):
         'retroville.users',
         'retroville.stories',
         'retroville.voice',
-        'retroville.matching_room',
+        'retroville.matching',
     )
 
     # https://docs.djangoproject.com/en/2.0/topics/http/middleware/

@@ -12,7 +12,7 @@ from .voice.views import incoming
 from .voice.views import makeCall
 from .voice.views import placeCall
 from .voice.views import ping
-from .matching_room.views import room
+from .matching.views import MatchViewSet, RoomViewSet
 from .chat.views import index, room
 
 admin.site.site_header = 'Retroville'
@@ -24,6 +24,8 @@ router.register(r"users", UserViewSet)
 router.register(r"users", UserCreateViewSet)
 router.register(r"stories", StoryViewSet)
 router.register(r"stories/read", UserReadStoryViewSet)
+router.register(r"room", RoomViewSet)
+router.register(r"matched", MatchViewSet)
 
 urlpatterns = [
     path("admin/", admin.site.urls),
@@ -36,7 +38,6 @@ urlpatterns = [
     path("incoming/", incoming, name="incoming"),
     path("makeCall/", makeCall, name="makeCall"),
     path("ping/", ping, name="ping"),
-    # path("room/", room, name="room"),
     path("chat/", index, name="chat"),
     path('chat/<str:room_name>/', room, name='room'),
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
