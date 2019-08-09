@@ -18,10 +18,10 @@ class Room(models.Model):
         return super(Room, self).save(*args, **kwargs)
 
     def __str__(self):
-        return f"{self.objects.all().count()} Users is Room"
+        return f"{self.id} {self.user} {self.access_token}"
 
     class Meta:
-        verbose_name_plural = "rooms"
+        verbose_name_plural = "room"
 
 
 class Match(models.Model):

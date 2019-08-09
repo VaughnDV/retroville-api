@@ -1,22 +1,25 @@
 
 from rest_framework import serializers
 from .models import Room, Match, MatchActivity, RoomActivity
+from django.contrib.auth import get_user_model
+
+User = get_user_model()
 
 
-class RoomSerializer(serializers.HyperlinkedModelSerializer):
+class RoomSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Room
-        fields = ("user", "access_token", "created_at")
+        fields = ("id", "user", "access_token", "created_at",)
         read_only_fields = ("created_at",)
 
     def create(self, validated_data):
         room = Room.objects.create(**validated_data)
-        RoomActivity.objects.create(**validated_data)
+        activity = RoomActivity.objects.create(**validated_data)
         return room
 
 
-class MatchSerializer(serializers.HyperlinkedModelSerializer):
+class MatchSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Match
@@ -27,9 +30,4 @@ class MatchSerializer(serializers.HyperlinkedModelSerializer):
             "receiver_access_token",
             "created_at",
         )
-        read_only_fields = ("created_at",)
 
-    def create(self, validated_data):
-        match = Match.objects.create(**validated_data)
-        MatchActivity.objects.create(**validated_data)
-        return match

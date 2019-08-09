@@ -168,3 +168,4 @@ channels_redis
 djangochannelsrestframework
 pytest-django
 pytest-asyncio
+celery
