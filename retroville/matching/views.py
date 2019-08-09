@@ -1,5 +1,5 @@
 from .models import Room, Match
-from .serializers import RoomSerializer, MatchSerializer
+from .serializers import RoomSerializer
 from rest_framework import status
 from django.views.decorators.csrf import csrf_exempt
 from django.contrib.auth import get_user_model
@@ -7,8 +7,9 @@ from django.http.response import JsonResponse
 from rest_framework.parsers import JSONParser
 from .tasks import match_maker
 from rest_framework.decorators import api_view
+from django.core.exceptions import ObjectDoesNotExist
 from django.db.models import Q
-import json
+
 
 User = get_user_model()
 
@@ -50,9 +51,10 @@ def enter_room(request):
 def update_token(request):
     if request.method == 'PUT':
         try:
-            room = Room.objects.filter(user=request.user)[0]
-        except Exception:
-            return JsonResponse({"error": "User not in room yet, try POST instead"}, status=400)
+            room = Room.objects.filter(user=request.user).first()
+        except ObjectDoesNotExist:
+            return JsonResponse({"message": "User not in room yet, try POST instead"}, status=400)
+
         data = JSONParser().parse(request)
         data["user"] = str(request.user)
         serializer = RoomSerializer(room, data=data)
@@ -66,9 +68,12 @@ def update_token(request):
 @api_view(['DELETE'])
 def exit_room(request):
     if request.method == 'DELETE':
-        room = Room.objects.filter(user=request.user)[0]
+        try:
+            room = Room.objects.filter(user=request.user).first()
+        except ObjectDoesNotExist:
+            return JsonResponse({"message": "User not found in room!"}, status=status.HTTP_400_BAD_REQUEST)
         room.delete()
-        return JsonResponse({}, status=status.HTTP_204_NO_CONTENT)
+        return JsonResponse({"message": "User has exited room!"}, status=status.HTTP_204_NO_CONTENT)
 
 
 @csrf_exempt
@@ -76,9 +81,6 @@ def exit_room(request):
 def find_match(request):
     if request.method == 'GET':
         match = match_maker(user_id=request.user.pk)
-        if not match:
-            return JsonResponse({}, status=status.HTTP_204_NO_CONTENT)
-
         return JsonResponse(match, status=status.HTTP_201_CREATED, safe=False)
 
 
@@ -86,6 +88,9 @@ def find_match(request):
 @api_view(['DELETE'])
 def delete_match(request):
     if request.method == 'DELETE':
-        match = Match.objects.filter(Q(caller=request.user) | Q(receiver=request.user))
+        try:
+            match = Match.objects.filter(Q(caller=request.user) | Q(receiver=request.user))
+        except ObjectDoesNotExist:
+            return JsonResponse({"message": "Match not found!"}, status=status.HTTP_400_BAD_REQUEST)
         match.delete()
-        return JsonResponse({}, status=status.HTTP_204_NO_CONTENT)
+        return JsonResponse({"message": "Match deleted"}, status=status.HTTP_204_NO_CONTENT)
