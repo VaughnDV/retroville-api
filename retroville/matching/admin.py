@@ -21,7 +21,7 @@ class MatchAdmin(admin.ModelAdmin):
 @admin.register(RoomActivity)
 class RoomActivityAdmin(admin.ModelAdmin):
     fields = ["user", "access_token"]
-    list_display = ["user"]
+    list_display = ["user", "created_at", "modified_at"]
     search_fields = ["user"]
 
 

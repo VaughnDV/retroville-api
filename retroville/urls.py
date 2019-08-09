@@ -12,9 +12,7 @@ from .voice.views import incoming
 from .voice.views import makeCall
 from .voice.views import placeCall
 from .voice.views import ping
-from .matching.views import MatchViewSet, RoomViewSet
-from .chat.views import index, room
-
+from .matching.views import enter_room, update_token, check_room, exit_room, list_room, find_match, delete_match
 admin.site.site_header = 'Retroville'
 admin.site.site_title = 'Retroville Admin Panel'
 admin.site.index_title = 'Retroville'
@@ -24,12 +22,10 @@ router.register(r"users", UserViewSet)
 router.register(r"users", UserCreateViewSet)
 router.register(r"stories", StoryViewSet)
 router.register(r"stories/read", UserReadStoryViewSet)
-router.register(r"room", RoomViewSet)
-router.register(r"matched", MatchViewSet)
+
 
 urlpatterns = [
     path("admin/", admin.site.urls),
-    path("api/v1/", include(router.urls)),
     path("api-token-auth/", views.obtain_auth_token),
     path("api-auth/", include("rest_framework.urls", namespace="rest_framework")),
     re_path(r"^$", RedirectView.as_view(url=reverse_lazy("api-root"), permanent=False)),
@@ -38,6 +34,12 @@ urlpatterns = [
     path("incoming/", incoming, name="incoming"),
     path("makeCall/", makeCall, name="makeCall"),
     path("ping/", ping, name="ping"),
-    path("chat/", index, name="chat"),
-    path('chat/<str:room_name>/', room, name='room'),
+    path("api/v1/", include(router.urls)),
+    path("api/v1/room/check/", check_room),
+    path("api/v1/room/enter/", enter_room),
+    path("api/v1/room/update/", update_token),
+    path("api/v1/room/exit/", exit_room),
+    path("api/v1/room/list/", list_room),
+    path("api/v1/match/find/", find_match),
+    path("api/v1/match/delete/", delete_match),
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

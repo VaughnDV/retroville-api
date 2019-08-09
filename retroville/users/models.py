@@ -56,7 +56,7 @@ class User(AbstractUser):
     objects = UserManager()
 
     def __str__(self):
-        return self.email
+        return str(self.id)
 
 
 @receiver(post_save, sender=settings.AUTH_USER_MODEL)

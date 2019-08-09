@@ -11,8 +11,8 @@ BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 class Common(Configuration):
 
     INSTALLED_APPS = (
-        'channels',
-        'retroville.chat',
+        # 'channels',
+        # 'retroville.chat',
         'retroville.config.suit.SuitConfig',
         "django.contrib.admin",
         "django.contrib.auth",
@@ -46,7 +46,7 @@ class Common(Configuration):
     ROOT_URLCONF = "retroville.urls"
     SECRET_KEY = os.getenv("DJANGO_SECRET_KEY")
     WSGI_APPLICATION = "retroville.wsgi.application"
-    ASGI_APPLICATION = "retroville.routing.application"
+    # ASGI_APPLICATION = "retroville.routing.application"
 
     # Email
     EMAIL_BACKEND = "django.core.mail.backends.smtp.EmailBackend"
@@ -204,11 +204,11 @@ class Common(Configuration):
         }
     }
 
-    CHANNEL_LAYERS = {
-        'default': {
-            'BACKEND': 'channels_redis.core.RedisChannelLayer',
-            'CONFIG': {
-                "hosts": [('redis', 6379)],
-            },
-        },
-    }
+    # CHANNEL_LAYERS = {
+    #     'default': {
+    #         'BACKEND': 'channels_redis.core.RedisChannelLayer',
+    #         'CONFIG': {
+    #             "hosts": [('redis', 6379)],
+    #         },
+    #     },
+    # }
