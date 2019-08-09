@@ -5,6 +5,7 @@ from django.db.models import Q
 from .models import Match, MatchActivity, Room
 from retroville.stories.models import UserReadStory, Story
 from django.core.serializers import serialize
+from django.core.exceptions import ObjectDoesNotExist
 import json
 
 
@@ -53,7 +54,10 @@ def match_maker(user_id):
         match = Match.objects.filter(Q(caller=user) | Q(receiver=user)).first()
         return fetch_stories(serialise_data(match))
 
-    user_in_room = Room.objects.filter(user=user)[0]
+    try:
+        user_in_room = Room.objects.get(user=user)
+    except ObjectDoesNotExist:
+        return {"Message": "Current user not in room!"}
 
     # Get all users in room
     other_users_in_room = Room.objects.exclude(user=user)
@@ -62,7 +66,7 @@ def match_maker(user_id):
     # Get the first user in room
     try:
         other_user_in_room = other_users_in_room[0]
-    except Exception:
+    except IndexError:
         return {"Message": "No other users in room!"}
 
     # get the other users info
