@@ -68,12 +68,12 @@ def update_token(request):
 @api_view(['DELETE'])
 def exit_room(request):
     if request.method == 'DELETE':
-        try:
-            room = Room.objects.filter(user=request.user).first()
-        except ObjectDoesNotExist:
-            return JsonResponse({"message": "User not found in room!"}, status=status.HTTP_400_BAD_REQUEST)
-        room.delete()
-        return JsonResponse({"message": "User has exited room!"}, status=status.HTTP_204_NO_CONTENT)
+
+        room = Room.objects.filter(user=request.user).first()
+        if room:
+            room.delete()
+            return JsonResponse({"message": "User has exited room!"}, status=status.HTTP_204_NO_CONTENT)
+        return JsonResponse({"message": "User not found in room!"}, status=status.HTTP_400_BAD_REQUEST)
 
 
 @csrf_exempt
@@ -88,9 +88,11 @@ def find_match(request):
 @api_view(['DELETE'])
 def delete_match(request):
     if request.method == 'DELETE':
-        try:
-            match = Match.objects.filter(Q(caller=request.user) | Q(receiver=request.user))
-        except ObjectDoesNotExist:
-            return JsonResponse({"message": "Match not found!"}, status=status.HTTP_400_BAD_REQUEST)
-        match.delete()
-        return JsonResponse({"message": "Match deleted"}, status=status.HTTP_204_NO_CONTENT)
+        match = Match.objects.filter(Q(caller=request.user) | Q(receiver=request.user)).first()
+
+        if match:
+            match.delete()
+            return JsonResponse({"message": "Match deleted"}, status=status.HTTP_204_NO_CONTENT)
+        return JsonResponse({"message": "Match not found!"}, status=status.HTTP_400_BAD_REQUEST)
+
+
