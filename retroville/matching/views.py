@@ -60,8 +60,8 @@ def update_token(request):
         serializer = RoomSerializer(room, data=data)
         if serializer.is_valid():
             serializer.save()
-            return JsonResponse(serializer.data)
-        return JsonResponse(serializer.errors, status=400)
+            return JsonResponse(serializer.data, status=status.HTTP_201_CREATED)
+        return JsonResponse(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
 @csrf_exempt
@@ -81,7 +81,10 @@ def exit_room(request):
 def find_match(request):
     if request.method == 'GET':
         match = match_maker(user_id=request.user.pk)
-        return JsonResponse(match, status=status.HTTP_201_CREATED, safe=False)
+        if "Message" not in match:
+            return JsonResponse(match, status=status.HTTP_201_CREATED, safe=False)
+        return JsonResponse(match, status=status.HTTP_204_NO_CONTENT)
+
 
 
 @csrf_exempt
