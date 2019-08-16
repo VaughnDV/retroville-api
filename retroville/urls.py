@@ -13,6 +13,7 @@ from .voice.views import makeCall
 from .voice.views import placeCall
 from .voice.views import ping
 from .matching.views import enter_room, update_token, check_room, exit_room, list_room, find_match, delete_match
+from .users.views import who_am_i
 admin.site.site_header = 'Retroville'
 admin.site.site_title = 'Retroville Admin Panel'
 admin.site.index_title = 'Retroville'
@@ -42,4 +43,5 @@ urlpatterns = [
     path("api/v1/room/list/", list_room),
     path("api/v1/match/find/", find_match),
     path("api/v1/match/delete/", delete_match),
+    path("api/v1/whoami/", who_am_i),
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
