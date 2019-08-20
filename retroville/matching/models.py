@@ -6,7 +6,7 @@ from django.conf import settings
 class Room(models.Model):
 
     user = models.OneToOneField(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name='+')
-    access_token = models.CharField(max_length=256)
+    access_token = models.CharField(max_length=1024)
     created_at = models.DateTimeField(editable=False)
     modified_at = models.DateTimeField()
 
@@ -27,9 +27,9 @@ class Room(models.Model):
 class Match(models.Model):
 
     caller = models.OneToOneField(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name='+')
-    caller_access_token = models.CharField(max_length=256)
+    caller_access_token = models.CharField(max_length=1024)
     receiver = models.OneToOneField(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name='+')
-    receiver_access_token = models.CharField(max_length=256)
+    receiver_access_token = models.CharField(max_length=1024)
     created_at = models.DateTimeField(editable=False)
     modified_at = models.DateTimeField()
 
@@ -50,7 +50,7 @@ class Match(models.Model):
 class RoomActivity(models.Model):
 
     user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
-    access_token = models.CharField(max_length=256)
+    access_token = models.CharField(max_length=1024)
     created_at = models.DateTimeField(editable=False)
     modified_at = models.DateTimeField()
 
@@ -68,9 +68,9 @@ class RoomActivity(models.Model):
 class MatchActivity(models.Model):
 
     caller = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name='+')
-    caller_access_token = models.CharField(max_length=256)
+    caller_access_token = models.CharField(max_length=1024)
     receiver = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name='+')
-    receiver_access_token = models.CharField(max_length=256)
+    receiver_access_token = models.CharField(max_length=1024)
     created_at = models.DateTimeField(editable=False)
     modified_at = models.DateTimeField()
 

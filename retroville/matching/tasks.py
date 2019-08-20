@@ -4,6 +4,7 @@ from django.contrib.auth import get_user_model
 from django.db.models import Q
 from .models import Match, MatchActivity, Room
 from retroville.stories.models import UserReadStory, Story
+from retroville.voice.tasks import generate_token
 from django.core.serializers import serialize
 from django.core.exceptions import ObjectDoesNotExist
 import json
@@ -75,9 +76,9 @@ def match_maker(user_id):
     # Create match with current user
     match = Match.objects.create(
         caller=user,
-        caller_access_token=user_in_room.access_token,
+        caller_access_token=generate_token(str(user.id)),
         receiver=other_user,
-        receiver_access_token=other_user_in_room.access_token
+        receiver_access_token=generate_token(str(other_user.id))
     )
 
     match.save()
@@ -85,9 +86,9 @@ def match_maker(user_id):
     # Record the match in the activity
     activity = MatchActivity.objects.create(
         caller=user,
-        caller_access_token=user_in_room.access_token,
+        caller_access_token=generate_token(str(user.id)),
         receiver=other_user,
-        receiver_access_token=other_user_in_room.access_token
+        receiver_access_token=generate_token(str(other_user.id))
     )
 
     activity.save()
