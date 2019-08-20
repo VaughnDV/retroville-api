@@ -6,7 +6,6 @@ from django.conf import settings
 class Room(models.Model):
 
     user = models.OneToOneField(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name='+')
-    access_token = models.CharField(max_length=1024)
     created_at = models.DateTimeField(editable=False)
     modified_at = models.DateTimeField()
 
@@ -18,7 +17,7 @@ class Room(models.Model):
         return super(Room, self).save(*args, **kwargs)
 
     def __str__(self):
-        return f"{self.id} {self.user} {self.access_token}"
+        return f"{self.id} {self.user}"
 
     class Meta:
         verbose_name_plural = "room"
@@ -50,7 +49,6 @@ class Match(models.Model):
 class RoomActivity(models.Model):
 
     user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
-    access_token = models.CharField(max_length=1024)
     created_at = models.DateTimeField(editable=False)
     modified_at = models.DateTimeField()
 

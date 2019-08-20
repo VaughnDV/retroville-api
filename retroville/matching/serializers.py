@@ -10,7 +10,7 @@ class RoomSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Room
-        fields = ("id", "user", "access_token", "created_at",)
+        fields = ("id", "user", "created_at",)
         read_only_fields = ("created_at",)
 
     def create(self, validated_data):

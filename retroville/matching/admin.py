@@ -4,8 +4,15 @@ from .models import Room, Match, RoomActivity, MatchActivity
 
 @admin.register(Room)
 class RoomAdmin(admin.ModelAdmin):
-    fields = ["user", "access_token"]
+    fields = ["user"]
     list_display = ["user"]
+    search_fields = ["user"]
+
+
+@admin.register(RoomActivity)
+class RoomActivityAdmin(admin.ModelAdmin):
+    fields = ["user"]
+    list_display = ["user", "created_at", "modified_at"]
     search_fields = ["user"]
 
 
@@ -16,13 +23,6 @@ class MatchAdmin(admin.ModelAdmin):
     ordering = ["modified_at", "created_at"]
     list_filter = ["caller", "receiver"]
     search_fields = ["caller", "receiver"]
-
-
-@admin.register(RoomActivity)
-class RoomActivityAdmin(admin.ModelAdmin):
-    fields = ["user", "access_token"]
-    list_display = ["user", "created_at", "modified_at"]
-    search_fields = ["user"]
 
 
 @admin.register(MatchActivity)

@@ -4,7 +4,6 @@ from twilio.twiml.voice_response import VoiceResponse
 from django.views.decorators.http import require_http_methods
 from django.http import HttpResponse
 from django.views.decorators.csrf import csrf_exempt
-from .tasks import generate_token
 
 
 ACCOUNT_SID = os.getenv("ACCOUNT_SID")
@@ -12,17 +11,6 @@ API_KEY = os.getenv("API_KEY")
 API_KEY_SECRET = os.getenv("API_KEY_SECRET")
 PUSH_CREDENTIAL_SID = os.getenv("PUSH_CREDENTIAL_SID")
 APP_SID = os.getenv("APP_SID")
-
-
-# @csrf_exempt
-# @require_http_methods(["GET", "POST"])
-# def token(request):
-#     if request.method == 'GET':
-#         identity = request.GET["identity"]
-#     else:
-#         identity = request.POST["identity"]
-#     access_token = generate_token(identity)
-#     return HttpResponse(access_token.to_jwt())
 
 
 @csrf_exempt
