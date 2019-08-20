@@ -22,6 +22,7 @@ services:
       - REDIS_URI=redis://localhost:6379
       - REDIS_URL=redis://redis_db:6379
       - DEBUG=True
+      - PUSH_CREDENTIAL_SID=CR35b55c0a2eeb63f0890fbe757b593796
 
     image: web
     build: ./

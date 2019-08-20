@@ -68,7 +68,6 @@ def update_token(request):
 @api_view(['DELETE'])
 def exit_room(request):
     if request.method == 'DELETE':
-
         room = Room.objects.filter(user=request.user).first()
         if room:
             room.delete()
@@ -92,7 +91,6 @@ def find_match(request):
 def delete_match(request):
     if request.method == 'DELETE':
         match = Match.objects.filter(Q(caller=request.user) | Q(receiver=request.user)).first()
-
         if match:
             match.delete()
             return JsonResponse({"message": "Match deleted"}, status=status.HTTP_204_NO_CONTENT)
