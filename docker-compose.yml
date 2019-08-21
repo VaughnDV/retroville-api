@@ -19,11 +19,10 @@ services:
       - API_KEY=SKdfc0811aee5d74f3089fcb168399c356
       - API_KEY_SECRET=VXCIvNyRhOf1I3ipd1u8SwiXBfJe48NB
       - APP_SID=APe42149306b5831c329fbc5419ff861c3
+      - PUSH_CREDENTIAL_SID=CR35b55c0a2eeb63f0890fbe757b593796
       - REDIS_URI=redis://localhost:6379
       - REDIS_URL=redis://redis_db:6379
       - DEBUG=True
-      - PUSH_CREDENTIAL_SID=CR35b55c0a2eeb63f0890fbe757b593796
-
     image: web
     build: ./
     command: >
