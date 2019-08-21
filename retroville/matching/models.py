@@ -1,6 +1,7 @@
 from django.db import models
 from django.utils import timezone
 from django.conf import settings
+from retroville.stories.models import Story
 
 
 class Room(models.Model):
@@ -29,6 +30,7 @@ class Match(models.Model):
     caller_access_token = models.CharField(max_length=1024)
     receiver = models.OneToOneField(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name='+')
     receiver_access_token = models.CharField(max_length=1024)
+    matched_story = models.ForeignKey(Story, on_delete=models.CASCADE)
     created_at = models.DateTimeField(editable=False)
     modified_at = models.DateTimeField()
 
@@ -69,6 +71,7 @@ class MatchActivity(models.Model):
     caller_access_token = models.CharField(max_length=1024)
     receiver = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name='+')
     receiver_access_token = models.CharField(max_length=1024)
+    matched_story = models.ForeignKey(Story, on_delete=models.CASCADE)
     created_at = models.DateTimeField(editable=False)
     modified_at = models.DateTimeField()
 
