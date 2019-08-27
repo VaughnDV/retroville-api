@@ -2,7 +2,7 @@ from __future__ import absolute_import, unicode_literals
 # from celery import shared_task
 from django.contrib.auth import get_user_model
 from django.db.models import Q
-from .models import Match, MatchActivity, Room
+from .models import Match, MatchActivity , Room
 from retroville.stories.models import UserReadStory, Story
 from retroville.voice.tasks import generate_token
 from django.core.serializers import serialize
@@ -40,7 +40,7 @@ def match_maker(user_id):
     # Check to see if user is in the matched table
     if Match.objects.filter(Q(caller=user) | Q(receiver=user)).exists():
         match = Match.objects.filter(Q(caller=user) | Q(receiver=user)).first()
-        return serialise_data(match)
+        return fetch_detail(serialise_data(match))
 
     try:
         user_in_room = Room.objects.get(user=user)
@@ -53,12 +53,18 @@ def match_maker(user_id):
         live_date=date.today().strftime("%Y-%m-%d")
     )
 
+    if not user_stories:
+        return {"Message": "There are no user read stories for today! add some?"}
+
     matched_story = None
     matched_user = None
 
     # Get all users in room
 
     other_users_in_room = Room.objects.exclude(user=user)
+    if not other_users_in_room:
+        {"Message": "No other users in room!"}
+
     for other in other_users_in_room:
         for story in user_stories:
             try:
@@ -85,8 +91,6 @@ def match_maker(user_id):
         matched_story=matched_story
     )
 
-    match.save()
-
     # Record the match in the activity
     activity = MatchActivity.objects.create(
         caller=user,
@@ -96,10 +100,20 @@ def match_maker(user_id):
         matched_story=matched_story
     )
 
-    activity.save()
-    # Delete both users from the room
+    if not Match.objects.filter(id=match.id).exists():
+        return {"Message": "Match not created"}
+
+    if not MatchActivity.objects.filter(id=activity.id).exists():
+        return {"Message": "Match Activity not created"}
+
     data = fetch_detail(serialise_data(match))
     user_in_room.delete()
-    matched_user.delete()
+    if not Room.objects.filter(user=user).exists():
+        Room.objects.filter(user_id=str(user.id)).delete()
+
+    matched_user_in_room = Room.objects.filter(user=matched_user)
+    matched_user_in_room.delete()
+    if Room.objects.filter(user=matched_user.id).exists():
+        Room.objects.filter(user=matched_user.id).delete()
 
     return data
