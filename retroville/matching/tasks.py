@@ -52,8 +52,8 @@ def match_maker(user_id):
         userreadstory__interested=True,
         live_date=date.today().strftime("%Y-%m-%d")
     )
-
     if not user_stories:
+
         return {"Message": "There are no user read stories for today! add some?"}
 
     matched_story = None
@@ -91,7 +91,6 @@ def match_maker(user_id):
         matched_story=matched_story
     )
 
-    # Record the match in the activity
     activity = MatchActivity.objects.create(
         caller=user,
         caller_access_token=generate_token(str(user.id)),
@@ -104,6 +103,7 @@ def match_maker(user_id):
         return {"Message": "Match not created"}
 
     if not MatchActivity.objects.filter(id=activity.id).exists():
+
         return {"Message": "Match Activity not created"}
 
     data = fetch_detail(serialise_data(match))
