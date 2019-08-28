@@ -6,8 +6,7 @@ from django.views.generic.base import RedirectView
 from rest_framework.routers import DefaultRouter
 from rest_framework.authtoken import views
 from .users.views import UserViewSet, UserCreateViewSet
-from .stories.views import StoryViewSet, UserReadStoryViewSet
-# from .voice.views import token
+from .stories.views import stories, read_story
 from .voice.views import incoming
 from .voice.views import make_call
 from .voice.views import place_call
@@ -23,8 +22,6 @@ admin.site.index_title = 'Retroville'
 router = DefaultRouter()
 router.register(r"users", UserViewSet)
 router.register(r"users", UserCreateViewSet)
-router.register(r"stories", StoryViewSet)
-router.register(r"stories/read", UserReadStoryViewSet)
 
 
 urlpatterns = [
@@ -46,4 +43,6 @@ urlpatterns = [
     path("api/v1/match/find/", find_match),
     path("api/v1/match/delete/", delete_match),
     path("api/v1/whoami/", who_am_i),
+    path("api/v1/stories/read/", read_story),
+    path("api/v1/stories/", stories),
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
