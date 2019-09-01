@@ -3,13 +3,15 @@ version: '2'
 services:
   postgres:
     image: postgres:9.6
-  redis:
-    restart: always
-    image: redis:latest
     ports:
-      - "6379:6379"
-    command: ["redis-server", "--appendonly", "yes"]
-    hostname: redis
+      - 5432:5432/tcp
+#  redis:
+#    restart: always
+#    image: redis:latest
+#    ports:
+#      - "6379:6379"
+#    command: ["redis-server", "--appendonly", "yes"]
+#    hostname: redis
 
   web:
     restart: always
@@ -35,15 +37,15 @@ services:
       - "8000:8000"
     depends_on:
       - postgres
-      - redis
-    links:
-      - redis
-  documentation:
-    restart: always
-    build: ./
-    command: "mkdocs serve"
-    volumes:
-      - ./:/code
-    ports:
-      - "8001:8001"
+#      - redis
+#    links:
+#      - redis
+#  documentation:
+#    restart: always
+#    build: ./
+#    command: "mkdocs serve"
+#    volumes:
+#      - ./:/code
+#    ports:
+#      - "8001:8001"
 

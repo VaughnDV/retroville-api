@@ -9,6 +9,7 @@ from django.core.serializers import serialize
 from django.core.exceptions import ObjectDoesNotExist
 import json
 from datetime import date
+import uuid
 
 
 User = get_user_model()
@@ -32,6 +33,72 @@ def fetch_detail(match):
     return match
 
 
+def find_match(user, user_stories):
+
+    matched_story = None
+    matched_user = None
+
+    other_users_in_room = Room.objects.exclude(user=user)
+    if not other_users_in_room:
+        {"Message": "No other users in room!"}
+
+    comparison_data = []
+
+    for other in other_users_in_room:
+        others_stories = []
+        for story in user_stories:
+            try:
+                s = serialise_data(story)
+                s["interested"] = UserReadStory.objects.filter(user_id=other.user.id, story=story.id).last().interested
+
+                others_stories.append(s)
+
+            except ObjectDoesNotExist:
+                continue
+            except AttributeError:
+                continue
+
+        comparison_data.append({
+            "user": {
+                "detail": serialise_data(User.objects.get(pk=other.user.id)),
+                "stories": others_stories
+                }
+            }
+        )
+
+    serialised_user_stories = []
+    for i in user_stories:
+        s = serialise_data(i)
+        s["interested"] = UserReadStory.objects.filter(user=user, story=i.id).last().interested
+        serialised_user_stories.append(s)
+
+    user_data = {
+        "user": {
+            "detail": serialise_data(user),
+            "stories": serialised_user_stories
+        }
+    }
+
+    # print("#" * 50)
+    # print("#" * 50)
+    # print("#" * 50)
+    # from pprint import pprint
+    # pprint(comparison_data)
+    # print("#" * 50)
+    # pprint(user_data)
+    # print("#" * 50)
+    # print("#" * 50)
+    # print("#" * 50)
+
+    try:
+        matched_story = Story.objects.get(id=user_stories[0].id)
+        matched_user = User.objects.get(pk=other_users_in_room[0].user_id)
+    except IndexError:
+        matched_story, matched_user = None, None
+
+    return matched_story, matched_user
+
+
 # @shared_task
 def match_maker(user_id):
     # Get user
@@ -49,54 +116,45 @@ def match_maker(user_id):
 
     user_stories = Story.objects.filter(
         userreadstory__user=user,
-        userreadstory__interested=True,
         live_date=date.today().strftime("%Y-%m-%d")
     )
     if not user_stories:
 
         return {"Message": "There are no user read stories for today! add some?"}
 
-    matched_story = None
-    matched_user = None
-
-    # Get all users in room
-
-    other_users_in_room = Room.objects.exclude(user=user)
-    if not other_users_in_room:
-        {"Message": "No other users in room!"}
-
-    for other in other_users_in_room:
-        for story in user_stories:
-            try:
-                other_interested = UserReadStory.objects.get(
-                    user_id=str(other.user.id),
-                    story=story,
-                    interested=True
-                )
-                if other_interested:
-                    matched_story = story
-                    matched_user = User.objects.get(pk=other.user.id)
-            except ObjectDoesNotExist:
-                continue
+    matched_story,  matched_user = find_match(user, user_stories)
 
     if not matched_user or not matched_story:
-        return {"Message": "Currently no one is interested in the same stories"}
+        return {"Message": "There are no users to match with at the moment!"}
 
     # Create match with current user
+    print("#" * 50)
+    print("#" * 50)
+    print("#" * 50)
+    print(type(matched_story))
+    print(matched_story)
+    print(matched_story.pk)
+    print("#" * 50)
+    print(type(matched_user))
+    print(matched_user)
+    print(matched_user.pk)
+    print("#" * 50)
+    print("#" * 50)
+
     match = Match.objects.create(
-        caller=user,
+        caller_id=user.id,
         caller_access_token=generate_token(str(user.id)),
-        receiver=matched_user,
+        receiver_id=matched_user.id,
         receiver_access_token=generate_token(str(matched_user.id)),
-        matched_story=matched_story
+        matched_story_id=matched_story.id
     )
 
     activity = MatchActivity.objects.create(
-        caller=user,
+        caller_id=user.id,
         caller_access_token=generate_token(str(user.id)),
-        receiver=matched_user,
+        receiver_id=matched_user.id,
         receiver_access_token=generate_token(str(matched_user.id)),
-        matched_story=matched_story
+        matched_story_id=matched_story.id
     )
 
     if not Match.objects.filter(id=match.id).exists():

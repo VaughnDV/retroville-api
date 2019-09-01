@@ -14,6 +14,9 @@ class RoomSerializer(serializers.ModelSerializer):
         read_only_fields = ("created_at",)
 
     def create(self, validated_data):
+        print(validated_data["user"])
+        if Room.objects.filter(user=validated_data["user"]).exists():
+            Room.objects.get(user=validated_data["user"]).delete()
         room = Room.objects.create(**validated_data)
         activity = RoomActivity.objects.create(**validated_data)
         return room
