@@ -40,12 +40,12 @@ services:
 #      - redis
 #    links:
 #      - redis
-#  documentation:
-#    restart: always
-#    build: ./
-#    command: "mkdocs serve"
-#    volumes:
-#      - ./:/code
-#    ports:
-#      - "8001:8001"
+  documentation:
+    restart: always
+    build: ./
+    command: "mkdocs serve"
+    volumes:
+      - ./:/code
+    ports:
+      - "8001:8001"
 
