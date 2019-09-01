@@ -37,8 +37,8 @@ def check_room(request):
 @api_view(['POST'])
 def enter_room(request):
     if request.method == 'POST':
-        data = JSONParser().parse(request)
-        data["user"] = str(request.user)
+        # data = JSONParser().parse(request)
+        data={"user": str(request.user)}
         serializer = RoomSerializer(data=data)
         if serializer.is_valid():
             serializer.save()
