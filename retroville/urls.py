@@ -27,9 +27,9 @@ router.register(r"users", UserCreateViewSet)
 
 urlpatterns = [
     path("admin/", admin.site.urls),
-    path('accounts/', include('django.contrib.auth.urls')),
-    path('accounts/login/', auth_views.LoginView.as_view(template_name='registration/login.html')),
-    path('accounts/password_reset/', auth_views.LoginView.as_view(template_name='registration/password_reset.html')),
+    # path('accounts/', include('django.contrib.auth.urls')),
+    # path('accounts/login/', auth_views.LoginView.as_view(template_name='registration/login.html')),
+    # path('accounts/password_reset/', auth_views.LoginView.as_view(template_name='registration/password_reset.html')),
     path("api-token-auth/", views.obtain_auth_token),
     path("api-auth/", include("rest_framework.urls", namespace="rest_framework")),
     # path("api/v1/password_reset/", include('django_rest_passwordreset.urls', namespace='password_reset')),
