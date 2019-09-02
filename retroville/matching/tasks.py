@@ -142,18 +142,18 @@ def match_maker(user_id):
     print("#" * 50)
 
     match = Match.objects.create(
-        caller_id=user.id,
-        caller_access_token=generate_token(str(user.id)),
-        receiver_id=matched_user.id,
-        receiver_access_token=generate_token(str(matched_user.id)),
+        caller_id=matched_user.id,
+        caller_access_token=generate_token(str(matched_user.id)),
+        receiver_id=user.id,
+        receiver_access_token=generate_token(str(user.id)),
         matched_story_id=matched_story.id
     )
 
     activity = MatchActivity.objects.create(
-        caller_id=user.id,
-        caller_access_token=generate_token(str(user.id)),
-        receiver_id=matched_user.id,
-        receiver_access_token=generate_token(str(matched_user.id)),
+        caller_id=matched_user.id,
+        caller_access_token=generate_token(str(matched_user.id)),
+        receiver_id=user.id,
+        receiver_access_token=generate_token(str(user.id)),
         matched_story_id=matched_story.id
     )
 
