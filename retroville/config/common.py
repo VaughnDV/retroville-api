@@ -25,6 +25,7 @@ class Common(Configuration):
         "rest_framework.authtoken",  # token authentication
         "django_filters",  # for filtering rest endpoints
         # Your apps
+        'django_rest_passwordreset',
         'retroville.users',
         'retroville.stories',
         'retroville.voice',

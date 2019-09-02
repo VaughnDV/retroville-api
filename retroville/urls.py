@@ -13,6 +13,7 @@ from .voice.views import place_call
 from .voice.views import ping
 from .matching.views import enter_room, update_token, check_room, exit_room, list_room, find_match, delete_match
 from .users.views import who_am_i
+from django.contrib.auth import views as auth_views
 
 
 admin.site.site_header = 'Retroville'
@@ -26,8 +27,12 @@ router.register(r"users", UserCreateViewSet)
 
 urlpatterns = [
     path("admin/", admin.site.urls),
+    path('accounts/', include('django.contrib.auth.urls')),
+    path('accounts/login/', auth_views.LoginView.as_view(template_name='registration/login.html')),
+    path('accounts/password_reset/', auth_views.LoginView.as_view(template_name='registration/password_reset.html')),
     path("api-token-auth/", views.obtain_auth_token),
     path("api-auth/", include("rest_framework.urls", namespace="rest_framework")),
+    # path("api/v1/password_reset/", include('django_rest_passwordreset.urls', namespace='password_reset')),
     re_path(r"^$", RedirectView.as_view(url=reverse_lazy("api-root"), permanent=False)),
     # path("accessToken/", token, name="token"),
     path("placeCall/", place_call, name="placeCall"),

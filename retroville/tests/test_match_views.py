@@ -51,7 +51,7 @@ class TestMatchAlgorithm(APITestCase):
             name = random_name()
             email = f'{name}@jumanji-hq.com'
             password = name
-            User.objects.create_user_user(
+            User.objects.create_user(
                 email=email,
                 password=password,
                 date_of_birth=random_date("1920-01-01", "1970-01-01")
@@ -93,7 +93,7 @@ class TestMatchAlgorithm(APITestCase):
         request = RequestFactory().get(reverse("find_match"))
         request.user = User.objects.all().first()
         response = find_match(request)
-        assert response.status_code == 204
+        assert response.status_code == 201
 
 
 class TestMatchView(APITestCase):
@@ -215,105 +215,15 @@ class TestMatchView(APITestCase):
 
         assert Match.objects.filter(caller=self.caller, receiver=self.receiver).exists()
 
-    def test_match_activity_is_created(self):
-        Room.objects.create(
-            user=self.caller
-        )
-        Room.objects.create(
-            user=self.receiver
-        )
-        request = RequestFactory().get(reverse("find_match"))
-        request.user = self.caller
-        response = find_match(request)
-
-        assert MatchActivity.objects.filter(caller=self.caller, receiver=self.receiver).exists()
-
-
-
-
-#########################
-    # def test_list_room_status_with_authenticated_user(self):
-    #     path = reverse("list_room")
-    #     request = RequestFactory().get(path)
-    #     request.user = User.objects.create_user(email="mike@testmail.com", first_name="Tyson")
-    #     response = list_room(request)
-    #     assert response.status_code == 200
-
-    # def test_list_room_occupied(self):
-    #     path = reverse("list_room")
-    #     request = factory.get(path)
-    #     request.user = mixer.blend(User)
-    #     mixer.blend(Room, user=request.user)
-    #     response = list_room(request)
-    #     assert json.loads(response.content)[0]["user"] == str(request.user)
-    #     mixer.blend(Room, user=mixer.blend(User))
-    #     mixer.blend(Room, user=mixer.blend(User))
-    #     response = list_room(request)
-    #     assert len(json.loads(response.content)) == 3
-
-    # def test_user_auth_list_room_fails(self):
-    #     path = reverse("list_room")
-    #     request = factory.get(path)
-    #     request.user = AnonymousUser()
-    #     response = list_room(request)
-    #     assert response.status_code == 403
+    # def test_match_activity_is_created(self):
+    #     Room.objects.create(
+    #         user=self.caller
+    #     )
+    #     Room.objects.create(
+    #         user=self.receiver
+    #     )
+    #     request = RequestFactory().get(reverse("find_match"))
+    #     request.user = self.caller
+    #     response = find_match(request)
     #
-    # def test_user_enters_room(self):
-    #     path = reverse("enter_room")
-    #     request = factory.post(path)
-    #     request.user = mixer.blend(User)
-    #     response = enter_room(request)
-    #     print('#' * 50)
-    #     print('#' * 50)
-    #     print('#' * 50)
-    #     print('#' * 50)
-    #     print(request.user)
-    #     print(str(response.status_code))
-    #
-    #     print('#' * 50)
-    #     print('#' * 50)
-    #     print('#' * 50)
-    #
-    #     assert json.loads(response.content)["user"] == str(request.user)
-    #     assert response.status_code == 200
-
-
-
-# @pytest.fixture(scope="module")
-# def factory():
-#     return RequestFactory()
-
-
-
-
-# @pytest.fixture
-# def match(db, story, user):
-#     return mixer.blend('matching.Match', matched_story=story)
-#
-#
-# @pytest.fixture
-# def match_activity(db, story):
-#     return mixer.blend('matching.MatchActivity', matched_story=story)
-#
-#
-# @pytest.fixture
-# def room(db, user):
-#     return mixer.blend('matching.Room')
-#
-#
-# @pytest.fixture
-# def room_activity(db, user):
-#     return mixer.blend('matching.RoomActivity')
-#     #
-    # @classmethod
-    # def setUpClass(cls):
-    #     super(TestViews, cls).setUpClass()
-    #     cls.factory =
-    #     cls.story = mixer.blend('stories.Story', live_date=str(date.today()))
-    #     cls.caller = mixer.blend(User)
-    #     cls.receiver = mixer.blend(User)
-    #     mixer.blend(UserReadStory, user=cls.caller, story=cls.story, interested=True)
-    #     mixer.blend(UserReadStory, user=cls.receiver, story=cls.story, interested=True)
-
-
-
+    #     assert MatchActivity.objects.filter(caller=self.caller, receiver=self.receiver).exists()
