@@ -172,6 +172,6 @@ def match_maker(user_id):
     matched_user_in_room = Room.objects.filter(user=matched_user)
     matched_user_in_room.delete()
     if Room.objects.filter(user=matched_user.id).exists():
-        Room.objects.filter(user=matched_user.id).delete()
+        Room.objects.filter(user_id=str(matched_user.id)).delete()
 
     return data
