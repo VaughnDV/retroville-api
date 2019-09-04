@@ -61,7 +61,7 @@ def find_match(user, user_stories):
         comparison_data.append({
             "user": {
                 "detail": serialise_data(User.objects.get(pk=other.user.id)),
-                "stories": others_stories
+                "story": others_stories
                 }
             }
         )
@@ -75,7 +75,7 @@ def find_match(user, user_stories):
     user_data = {
         "user": {
             "detail": serialise_data(user),
-            "stories": serialised_user_stories
+            "story": serialised_user_stories
         }
     }
 
@@ -171,7 +171,7 @@ def match_maker(user_id):
 
     matched_user_in_room = Room.objects.filter(user=matched_user)
     matched_user_in_room.delete()
-    if Room.objects.filter(user=matched_user.id).exists():
+    if Room.objects.filter(user_id=str(matched_user.id)).exists():
         Room.objects.filter(user_id=str(matched_user.id)).delete()
 
     return data
