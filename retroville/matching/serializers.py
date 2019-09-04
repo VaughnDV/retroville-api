@@ -14,13 +14,11 @@ class RoomSerializer(serializers.ModelSerializer):
         read_only_fields = ("created_at",)
 
     def create(self, validated_data):
-        print("#" * 50)
-        print("#" * 50)
         print(validated_data["user"])
-        print("#" * 50)
-        print("#" * 50)
-        room = RoomActivity.objects.create_or_update(user=validated_data["user"])
-        RoomActivity.objects.create(**validated_data)
+        if Room.objects.filter(user=validated_data["user"]).exists():
+            RoomActivity.objects.update(user=validated_data["user"])
+        room = Room.objects.create(**validated_data)
+        activity = RoomActivity.objects.create(**validated_data)
         return room
 
 
