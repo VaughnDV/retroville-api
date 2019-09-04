@@ -27,7 +27,7 @@ def serialise_data(data):
 
 
 def fetch_detail(match):
-    match["matched_story"] = serialise_data(Story.objects.get(id=match["matched_story"]))
+    match["story"] = serialise_data(Story.objects.get(id=match["matched_story"]))
     match["caller"] = serialise_data(User.objects.get(id=match["caller"]))
     match["receiver"] = serialise_data(User.objects.get(id=match["receiver"]))
     return match
@@ -61,7 +61,7 @@ def find_match(user, user_stories):
         comparison_data.append({
             "user": {
                 "detail": serialise_data(User.objects.get(pk=other.user.id)),
-                "story": others_stories
+                "stories": others_stories
                 }
             }
         )
@@ -75,7 +75,7 @@ def find_match(user, user_stories):
     user_data = {
         "user": {
             "detail": serialise_data(user),
-            "story": serialised_user_stories
+            "stories": serialised_user_stories
         }
     }
 
