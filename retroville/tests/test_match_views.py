@@ -227,3 +227,47 @@ class TestMatchView(APITestCase):
     #     response = find_match(request)
     #
     #     assert MatchActivity.objects.filter(caller=self.caller, receiver=self.receiver).exists()
+
+class TestMatchView(APITestCase):
+    """Testing check_room, exit_room, list_room, enter_room,"""
+    def setUp(self) -> None:
+        self.client = Client()
+
+        self.user = User.objects.create_user(
+            email="caller@jumanji.com",
+            password="password123",
+            date_of_birth=random_date("1920-01-01", "1970-01-01")
+        )
+
+
+    def test_check_room_works(self):
+        Room.objects.create(
+            user=self.user
+        )
+
+        request = RequestFactory().get(reverse("check_room"))
+        request.user = self.user
+        response = check_room(request)
+        assert response.status_code == 200
+
+        Room.objects.get(
+            user=self.user
+        ).delete()
+
+        response = check_room(request)
+        assert response.status_code == 200
+
+    def test_match_is_not_duplicated(self):
+        Room.objects.create(
+            user=self.user
+        )
+
+        request = RequestFactory().post(reverse("enter_room"))
+        request.user = self.user
+        response = enter_room(request)
+        print("#" * 50)
+        print("#" * 50)
+        print(dir(response))
+        print("#" * 50)
+        print("#" * 50)
+        assert response.status_code == 204
