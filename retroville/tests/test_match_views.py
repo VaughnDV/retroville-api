@@ -1,17 +1,12 @@
-from django.contrib.auth.models import AnonymousUser
+from rest_framework.test import APIRequestFactory
 from django.urls import reverse
 from django.test import RequestFactory, Client
-# from retroville.users.models import User
 from retroville.stories.models import Story, UserReadStory
 from retroville.matching.models import Match, MatchActivity, Room, RoomActivity
 from retroville.matching.views import check_room, exit_room, list_room, enter_room, find_match, delete_match
-from mixer.backend.django import mixer
-import pytest
-from django.db.models import Q
 import json
-from datetime import date, timedelta
+from datetime import date
 from django.contrib.auth import get_user_model
-from rest_framework import status
 from rest_framework.test import APITestCase
 import string
 import random
@@ -215,18 +210,19 @@ class TestMatchView(APITestCase):
 
         assert Match.objects.filter(caller=self.caller, receiver=self.receiver).exists()
 
-    # def test_match_activity_is_created(self):
-    #     Room.objects.create(
-    #         user=self.caller
-    #     )
-    #     Room.objects.create(
-    #         user=self.receiver
-    #     )
-    #     request = RequestFactory().get(reverse("find_match"))
-    #     request.user = self.caller
-    #     response = find_match(request)
-    #
-    #     assert MatchActivity.objects.filter(caller=self.caller, receiver=self.receiver).exists()
+    def test_match_activity_is_created(self):
+        Room.objects.create(
+            user=self.caller
+        )
+        Room.objects.create(
+            user=self.receiver
+        )
+        request = RequestFactory().get(reverse("find_match"))
+        request.user = self.caller
+        response = find_match(request)
+
+        assert MatchActivity.objects.filter(caller=self.caller, receiver=self.receiver).exists()
+
 
 class TestMatchView(APITestCase):
     """Testing check_room, exit_room, list_room, enter_room,"""
@@ -238,7 +234,6 @@ class TestMatchView(APITestCase):
             password="password123",
             date_of_birth=random_date("1920-01-01", "1970-01-01")
         )
-
 
     def test_check_room_works(self):
         Room.objects.create(
@@ -257,17 +252,27 @@ class TestMatchView(APITestCase):
         response = check_room(request)
         assert response.status_code == 200
 
-    def test_match_is_not_duplicated(self):
+    def test_user_in_room_is_not_duplicated(self):
         Room.objects.create(
             user=self.user
         )
-
-        request = RequestFactory().post(reverse("enter_room"))
+        request = APIRequestFactory(enforce_csrf_checks=False).post(reverse("enter_room"))
         request.user = self.user
         response = enter_room(request)
-        print("#" * 50)
-        print("#" * 50)
-        print(dir(response))
-        print("#" * 50)
-        print("#" * 50)
+        assert response.status_code == 200
+
+    def test_user_in_room_is_created(self):
+        request = APIRequestFactory(enforce_csrf_checks=False).post(reverse("enter_room"))
+        request.user = self.user
+        response = enter_room(request)
+        assert response.status_code == 201
+
+    def test_user_in_room_is_deleted(self):
+        Room.objects.create(
+            user=self.user
+        )
+        request = APIRequestFactory(enforce_csrf_checks=False).delete(reverse("exit_room"))
+        request.user = self.user
+        response = exit_room(request)
+        assert Room.objects.filter(user=self.user).exists() == False
         assert response.status_code == 204
