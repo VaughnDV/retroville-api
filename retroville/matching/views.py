@@ -37,13 +37,21 @@ def check_room(request):
 @api_view(['POST'])
 def enter_room(request):
     if request.method == 'POST':
-        # data = JSONParser().parse(request)
-        data={"user": str(request.user)}
+        data = {"user": request.user.pk}
+        room = Room.objects.filter(user=request.user)
         serializer = RoomSerializer(data=data)
-        if serializer.is_valid():
-            serializer.save()
+        if room:
+            if serializer.is_valid(raise_exception=False):
+                pass
+            try:
+                return JsonResponse(serializer.data, safe=False, status=status.HTTP_200_OK)
+            except Exception as e:
+                print(e)
+
+        if serializer.is_valid(raise_exception=True):
+            serializer.create(data)
             return JsonResponse(serializer.data, status=status.HTTP_201_CREATED)
-        return JsonResponse(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+    return JsonResponse(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
 @csrf_exempt

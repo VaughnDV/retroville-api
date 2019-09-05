@@ -6,14 +6,14 @@ from .models import Room, Match, RoomActivity, MatchActivity
 class RoomAdmin(admin.ModelAdmin):
     fields = ["user"]
     list_display = ["user", "created_at", "modified_at"]
-    search_fields = ["user", "created_at"]
+    search_fields = ["user", "created_at", "modified_at"]
 
 
 @admin.register(RoomActivity)
 class RoomActivityAdmin(admin.ModelAdmin):
     fields = ["user"]
     list_display = ["user", "created_at", "modified_at"]
-    search_fields = ["user", "created_at"]
+    search_fields = ["user", "created_at", "modified_at"]
 
 
 @admin.register(Match)
