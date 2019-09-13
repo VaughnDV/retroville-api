@@ -1,1 +1,1 @@
-Cron: python cron.py
+cron: python ./cron.py
