@@ -106,3 +106,11 @@ def delete_match(request):
         return JsonResponse({"message": "Match not found!"}, status=status.HTTP_400_BAD_REQUEST)
 
 
+@csrf_exempt
+@api_view(['GET'])
+def check_match(request, match_id):
+    if request.method == 'GET':
+        match_exists = Match.objects.filter(id=match_id).exists()
+        if match_exists:
+            return JsonResponse({"message": "Match exists!"}, status=status.HTTP_200_OK)
+        return JsonResponse({"message": "Match not found!"}, status=status.HTTP_404_NOT_FOUND)

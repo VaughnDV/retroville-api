@@ -11,7 +11,7 @@ from .voice.views import incoming
 from .voice.views import make_call
 from .voice.views import place_call
 from .voice.views import ping
-from .matching.views import enter_room, update_token, check_room, exit_room, list_room, find_match, delete_match
+from .matching.views import enter_room, update_token, check_room, exit_room, list_room, find_match, delete_match, check_match
 from .users.views import who_am_i
 from django.contrib.auth import views as auth_views
 
@@ -46,6 +46,7 @@ urlpatterns = [
     path("api/v1/room/exit/", exit_room, name="exit_room"),
     path("api/v1/room/list/", list_room, name="list_room"),
     path("api/v1/match/find/", find_match, name="find_match"),
+    path("api/v1/match/check/<match_id>", check_match, name="check_match"),
     path("api/v1/match/delete/", delete_match, name="delete_match"),
     path("api/v1/whoami/", who_am_i, name="who_am_i"),
     path("api/v1/stories/read/", read_story, name="read_story"),
