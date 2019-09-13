@@ -24,6 +24,7 @@ class Common(Configuration):
         "rest_framework",  # utilities for rest apis
         "rest_framework.authtoken",  # token authentication
         "django_filters",  # for filtering rest endpoints
+        # "django_crontab",  # For cron-jobs
         # Your apps
         'django_rest_passwordreset',
         'retroville.users',
@@ -213,3 +214,7 @@ class Common(Configuration):
     #         },
     #     },
     # }
+
+    # CRONJOBS = [
+    #     ('*/5 * * * *', 'retroville.cron.fetch_stories_for_today')
+    # ]

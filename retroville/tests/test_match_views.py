@@ -11,6 +11,7 @@ from rest_framework.test import APITestCase
 import string
 import random
 import time
+from django.db.models import Q
 
 User = get_user_model()
 
@@ -53,10 +54,6 @@ class TestMatchAlgorithm(APITestCase):
             )
 
             picture_url = "https://loremflickr.com/640/480/beach,holiday,old/all"
-            live_date = random_date(
-                date.today().strftime("%Y-%m-%d"),
-                date.today().strftime("%Y-%m-%d")
-            )
 
             live_date = random_date(
                 date.today().strftime("%Y-%m-%d"),
@@ -70,8 +67,6 @@ class TestMatchAlgorithm(APITestCase):
                 picture_url=picture_url,
                 live_date=live_date
             )
-
-        stories = Story.objects.all()
 
         for u in User.objects.all():
             for s in Story.objects.all():
@@ -89,6 +84,38 @@ class TestMatchAlgorithm(APITestCase):
         request.user = User.objects.all().first()
         response = find_match(request)
         assert response.status_code == 201
+
+    def test_match_is_created(self):
+        request = RequestFactory().get(reverse("find_match"))
+        request.user = User.objects.all().first()
+        response = find_match(request)
+        assert Match.objects.filter(Q(caller=self.caller) | Q(receiver=self.receiver)).exists()
+
+    def test_user_in_room_is_deleted_after_match(self):
+        request = RequestFactory().get(reverse("find_match"))
+        request.user = User.objects.all().first()
+        response = find_match(request)
+
+        assert not Room.objects.filter(Q(user=self.caller) | Q(user=self.receiver)).exists()
+
+    def test_no_user_users_to_match_with_no_other_user_in_room(self):
+        request = RequestFactory().get(reverse("find_match"))
+        request.user = self.caller
+        self.receiver.delete()
+        response = find_match(request)
+        assert json.loads(response.content)["Message"] == 'There are no users to match with at the moment!'
+        assert response.status_code == 204
+
+    def test_no_user_users_to_match_with_no_stories_read(self):
+        for item in UserReadStory.objects.filter(user=self.receiver):
+            item.delete()
+
+        request = RequestFactory().get(reverse("find_match"))
+        request.user = self.caller
+        response = find_match(request)
+        print(response.content)
+        assert json.loads(response.content)["Message"] == "There are no users to match with at the moment!"
+        assert response.status_code == 204
 
 
 class TestMatchView(APITestCase):
@@ -108,10 +135,7 @@ class TestMatchView(APITestCase):
         )
 
         picture_url = "https://loremflickr.com/640/480/beach,holiday,old/all"
-        live_date = random_date(
-            date.today().strftime("%Y-%m-%d"),
-            date.today().strftime("%Y-%m-%d")
-        )
+        live_date = date.today().strftime("%Y-%m-%d")
 
         random_string = random_name()
         self.story1 = Story.objects.create(
@@ -149,27 +173,6 @@ class TestMatchView(APITestCase):
                 interested=v
             )
 
-    def test_match_is_created(self):
-        Room.objects.create(
-            user=self.caller
-        )
-        Room.objects.create(
-            user=self.receiver
-        )
-        request = RequestFactory().get(reverse("find_match"))
-        request.user = self.caller
-        response = find_match(request)
-        assert response.status_code == 204
-
-    def test_no_user_users_to_match_with_no_other_user_in_room(self):
-        Room.objects.create(
-            user=self.caller
-        )
-        request = RequestFactory().get(reverse("find_match"))
-        request.user = self.caller
-        response = find_match(request)
-        assert json.loads(response.content)["Message"] == 'There are no users to match with at the moment!'
-        assert response.status_code == 204
 
     def test_user_not_in_room(self):
         Room.objects.create(
@@ -180,7 +183,7 @@ class TestMatchView(APITestCase):
         response = find_match(request)
         assert json.loads(response.content)["Message"] == "Current user not in room!"
         assert response.status_code == 204
-
+#
     def test_no_user_users_to_match_with_no_stories_read(self):
         Room.objects.create(
             user=self.caller
@@ -197,34 +200,73 @@ class TestMatchView(APITestCase):
         assert json.loads(response.content)["Message"] == "There are no users to match with at the moment!"
         assert response.status_code == 204
 
-    def test_match_is_created(self):
-        Room.objects.create(
-            user=self.caller
-        )
-        Room.objects.create(
-            user=self.receiver
-        )
-        request = RequestFactory().get(reverse("find_match"))
-        request.user = self.caller
-        response = find_match(request)
+    # def test_match_is_created(self):
+    #     Room.objects.create(
+    #         user=self.caller
+    #     )
+    #     Room.objects.create(
+    #         user=self.receiver
+    #     )
+    #     request = RequestFactory().get(reverse("find_match"))
+    #     request.user = self.caller
+    #     response = find_match(request)
+    #
+    #     assert Match.objects.filter(caller=self.caller, receiver=self.receiver).exists()
+#
+#     def test_user_in_room_is_deleted_after_match(self):
+#         Room.objects.create(
+#             user=self.caller
+#         )
+#         Room.objects.create(
+#             user=self.receiver
+#         )
+#         request = RequestFactory().get(reverse("find_match"))
+#         request.user = self.caller
+#         response = find_match(request)
+#
+#         assert not Room.objects.filter(Q(user=self.caller) | Q(user=self.receiver)).exists()
+#
+#     def test_match_activity_is_created(self):
+#         Room.objects.create(
+#             user=self.caller
+#         )
+#         Room.objects.create(
+#             user=self.receiver
+#         )
+#         request = RequestFactory().get(reverse("find_match"))
+#         request.user = self.caller
+#         response = find_match(request)
+#
+#         assert MatchActivity.objects.filter(caller=self.caller, receiver=self.receiver).exists()
+#
+#     def test_match_activity_is_created(self):
+#         Room.objects.create(
+#             user=self.caller
+#         )
+#         Room.objects.create(
+#             user=self.receiver
+#         )
+#         request = RequestFactory().get(reverse("find_match"))
+#         request.user = self.caller
+#         response = find_match(request)
+#
+#         assert MatchActivity.objects.filter(caller=self.caller, receiver=self.receiver).exists()
+#
+#     def test_room_activity_is_created(self):
+#         Room.objects.create(
+#             user=self.caller
+#         )
+#         Room.objects.create(
+#             user=self.receiver
+#         )
+#         request = RequestFactory().get(reverse("find_match"))
+#         request.user = self.caller
+#         response = find_match(request)
+#
+#         assert RoomActivity.objects.filter(Q(user=self.caller) | Q(user=self.receiver)).exists()
 
-        assert Match.objects.filter(caller=self.caller, receiver=self.receiver).exists()
 
-    def test_match_activity_is_created(self):
-        Room.objects.create(
-            user=self.caller
-        )
-        Room.objects.create(
-            user=self.receiver
-        )
-        request = RequestFactory().get(reverse("find_match"))
-        request.user = self.caller
-        response = find_match(request)
-
-        assert MatchActivity.objects.filter(caller=self.caller, receiver=self.receiver).exists()
-
-
-class TestMatchView(APITestCase):
+class TestRoomView(APITestCase):
     """Testing check_room, exit_room, list_room, enter_room,"""
     def setUp(self) -> None:
         self.client = Client()

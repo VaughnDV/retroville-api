@@ -90,6 +90,7 @@ def find_match(request):
         match = match_maker(user_id=request.user.pk)
         if "Message" not in match:
             return JsonResponse(match, status=status.HTTP_201_CREATED, safe=False)
+        print(match)
         return JsonResponse(match, status=status.HTTP_204_NO_CONTENT)
 
 
