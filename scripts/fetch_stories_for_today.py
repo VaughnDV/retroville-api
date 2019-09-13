@@ -1,0 +1,67 @@
+import sys
+import os
+import django
+import string
+import random
+import time
+from datetime import date
+import requests
+import json
+from pprint import pprint
+
+
+def random_date(start, end):
+    stime = time.mktime(time.strptime(start, '%Y-%m-%d'))
+    etime = time.mktime(time.strptime(end, '%Y-%m-%d'))
+    ptime = stime + random.random() * (etime - stime)
+    return time.strftime('%Y-%m-%d', time.localtime(ptime))
+
+
+def random_name(size=6, chars=string.ascii_lowercase + string.digits):
+    return ''.join(random.choice(chars) for _ in range(size))
+
+
+def main():
+    url = "https://newsapi.org/v2/top-headlines"
+    checked = []
+    catagories = ["business", "business", "health", "health", "technology", "science", "sports", "entertainment", "general", "general"]
+
+    for catagory in catagories:
+
+        request_url = f"{url}?country={COUNTRY}&category={catagory}&sortBy=popularity&language={LANGUAGE}&apiKey={NEWS_API_KEY}"
+        pprint(request_url)
+
+        title = None
+        content = None
+        index = checked.count(f"{catagory}")
+
+        while not content and not title:
+            response = requests.get(request_url)
+            articles = json.loads(response.content)["articles"]
+            title = articles[index][f"title"]
+            content = articles[index]["description"]
+            picture_url = articles[index]["urlToImage"]
+            live_date = date.today().strftime("%Y-%m-%d")
+
+        Story.objects.create(
+            title=title,
+            content=content,
+            picture_url=picture_url,
+            live_date=live_date
+        )
+        checked.append(catagory)
+
+
+
+if __name__ == '__main__':
+    sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+    os.environ.setdefault("DJANGO_CONFIGURATION", "Local")
+    os.environ.setdefault("DJANGO_SETTINGS_MODULE", "retroville.config")
+    COUNTRY = os.environ.get("COUNTRY", "gb")
+    LANGUAGE = os.environ.get("LANGUAGE", "en")
+    NEWS_API_KEY = os.environ.get("NEWS_API_KETY", "NEWSAPI_KEY_REDACTED")
+    import configurations
+    configurations.setup()
+    from retroville.stories.models import Story
+    django.setup()
+    main()
