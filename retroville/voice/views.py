@@ -51,7 +51,7 @@ def make_call(request):
         to = request.GET.get("to")
         caller = request.GET.get("From")
 
-    resp.dial(callerId=caller).client(to)
+    resp.dial(callerId=caller, answer_on_bridge=True).client(to)
 
     return HttpResponse(str(resp))
 
