@@ -12,30 +12,42 @@ sched = BlockingScheduler()
 
 
 # @sched.scheduled_job('cron', day_of_week='mon-sun', hour=00)
-@sched.scheduled_job('interval', minutes=1)
+# @sched.scheduled_job('interval', minutes=1)
 def fetch_stories():
-    pprint(date)
-    # url = "https://newsapi.org/v2/top-headlines"
-    # checked = []
-    # catagories = ["business", "business", "health", "health", "technology", "science", "sports", "entertainment", "general", "general"]
-    #
-    # for catagory in catagories:
-    #
-    #     request_url = f"{url}?country={COUNTRY}&category={catagory}&sortBy=popularity&language={LANGUAGE}&apiKey={NEWS_API_KEY}"
-    #     pprint(request_url)
-    #
-    #     title = None
-    #     content = None
-    #     index = checked.count(f"{catagory}")
-    #
-    #     while not content and not title:
-    #         response = requests.get(request_url)
-    #         pprint(response.content)
-    #         articles = json.loads(response.content)["articles"]
-    #         title = articles[index][f"title"]
-    #         content = articles[index]["content"].rstrip()
-    #         picture_url = articles[index]["urlToImage"]
-    #         live_date = date.today().strftime("%Y-%m-%d")
+    print("#" * 50)
+    print(date.today())
+    print("#" * 50)
+    url = "https://newsapi.org/v2/top-headlines"
+    checked = []
+    checked_titles = []
+    catagories = ["business", "business", "health", "health", "technology", "science", "sports", "entertainment", "general", "general"]
+
+    for catagory in catagories:
+
+        request_url = f"{url}?country={COUNTRY}&category={catagory}&sortBy=popularity&language={LANGUAGE}&apiKey={NEWS_API_KEY}"
+        print(request_url)
+        print("#" * 50)
+
+        title = None
+        content = None
+        # index = checked.count(f"{catagory}")
+
+        response = requests.get(request_url)
+        pprint(response.content)
+
+        articles = json.loads(response.content)["articles"]
+
+        for key, value in articles
+            if key["title"] and key["title"] not in checked_titles:
+                title = key["title"]
+            else:
+                continue
+            if key["content"]:
+                content = key["content"].rstrip()
+            else:
+                continue
+            picture_url = key["urlToImage"]
+            live_date = date.today().strftime("%Y-%m-%d")
     #
     #     Story.objects.create(
     #         title=title,
