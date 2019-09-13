@@ -37,16 +37,16 @@ def fetch_stories():
 
         articles = json.loads(response.content)["articles"]
 
-        for key, value in articles
-            if key["title"] and key["title"] not in checked_titles:
-                title = key["title"]
+        for artitle in articles:
+            if artitle["title"] and artitle["title"] not in checked_titles:
+                title = artitle["title"]
             else:
                 continue
-            if key["content"]:
-                content = key["content"].rstrip()
+            if artitle["content"]:
+                content = artitle["content"].rstrip()
             else:
                 continue
-            picture_url = key["urlToImage"]
+            picture_url = artitle["urlToImage"]
             live_date = date.today().strftime("%Y-%m-%d")
     #
     #     Story.objects.create(

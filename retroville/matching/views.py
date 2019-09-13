@@ -108,8 +108,9 @@ def delete_match(request):
 
 @csrf_exempt
 @api_view(['GET'])
-def check_match(request, match_id):
+def check_match(request):
     if request.method == 'GET':
+        match_id = request.GET.get('match_id', '')
         match_exists = Match.objects.filter(id=match_id).exists()
         if match_exists:
             return JsonResponse({"message": "Match exists!"}, status=status.HTTP_200_OK)
