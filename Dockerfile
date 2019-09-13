@@ -6,7 +6,6 @@ COPY ./requirements.txt requirements.txt
 RUN apt-get update && apt-get install -y cron && apt-get install -y nano
 RUN pip install --upgrade pip
 RUN pip install -r requirements.txt
-RUN python ./cron.py
 
 # Adds our application code to the image
 COPY . code
