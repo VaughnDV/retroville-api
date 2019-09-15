@@ -2,16 +2,20 @@ import os
 from twilio.rest import Client
 from twilio.twiml.voice_response import VoiceResponse
 from django.views.decorators.http import require_http_methods
-from django.http import HttpResponse
+from django.http import HttpResponse, JsonResponse
 from django.views.decorators.csrf import csrf_exempt
+from authy.api import AuthyApiClient
+from django.db.models import Q
 
 
+AUTHY_API_KEY = os.environ.get('AUTHY_API_KEY')
 ACCOUNT_SID = os.getenv("ACCOUNT_SID")
 API_KEY = os.getenv("API_KEY")
 API_KEY_SECRET = os.getenv("API_KEY_SECRET")
 PUSH_CREDENTIAL_SID = os.getenv("PUSH_CREDENTIAL_SID")
 APP_SID = os.getenv("APP_SID")
 
+api = AuthyApiClient(AUTHY_API_KEY)
 
 @csrf_exempt
 @require_http_methods(["GET", "POST"])
@@ -73,3 +77,39 @@ def incoming(request):
     resp = VoiceResponse()
     resp.say("Congratulations! You have received your first inbound call! Good bye.")
     return HttpResponse(str(resp))
+
+
+@csrf_exempt
+@require_http_methods(["POST"])
+def send_sms(request):
+    country_code = request.POST.get("country_code")
+    phone_number = request.POST.get("phone_number")
+
+    if not User.objects.filter(Q(country_code=country_code) & Q(phone_number=phone_number)):
+
+        r = api.phones.verification_start(
+            phone_number=phone_number,
+            country_code=country_code,
+            via='sms')
+
+        if r.ok():
+            return JsonResponse(success=True, message = r.content['message'])
+        else:
+            return JsonResponse(success=False, message=r.errors()['message'])
+    return JsonResponse(success=False, message="There is an account already associated with this number, please log in.")
+
+
+@csrf_exempt
+@require_http_methods(["POST"])
+def validate_sms(request):
+    country_code = request.POST.get("country_code")
+    phone_number = request.POST.get("phone_number")
+    code = request.POST.get("verification_code")
+
+    r = api.phones.verification_check(phone_number, country_code, code)
+
+    if r.ok():
+        return JsonResponse(success=True, message=r.content['message'])
+    else:
+        return JsonResponse(success=False, message=r.errors()['message'])
+

@@ -10,7 +10,7 @@ from .stories.views import stories, read_story
 from .voice.views import incoming
 from .voice.views import make_call
 from .voice.views import place_call
-from .voice.views import ping
+from .voice.views import ping, send_sms, validate_sms
 from .matching.views import enter_room, update_token, check_room, exit_room, list_room, find_match, delete_match, check_match
 from .users.views import who_am_i
 from django.contrib.auth import views as auth_views
@@ -38,6 +38,8 @@ urlpatterns = [
     path("placeCall/", place_call, name="placeCall"),
     path("incoming/", incoming, name="incoming"),
     path("makeCall/", make_call, name="makeCall"),
+    path("sendSMS/", send_sms, name="sendSMS"),
+    path("validateSMS/", validate_sms, name="validateSMS"),
     path("ping/", ping, name="ping"),
     path("api/v1/", include(router.urls)),
     path("api/v1/room/check/", check_room, name="check_room"),
@@ -51,4 +53,5 @@ urlpatterns = [
     path("api/v1/whoami/", who_am_i, name="who_am_i"),
     path("api/v1/stories/read/", read_story, name="read_story"),
     path("api/v1/stories/", stories, name="stories"),
+
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

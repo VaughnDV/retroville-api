@@ -25,6 +25,7 @@ services:
       - REDIS_URI=redis://localhost:6379
       - REDIS_URL=redis://redis_db:6379
       - DEBUG=True
+      - AUTHY_API_KEY=07RY1LIb4Ift8qCf2MCXTZyhsrY5PvZ1
     image: web
     build: ./
     command: >
