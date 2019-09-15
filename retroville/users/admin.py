@@ -28,7 +28,7 @@ class UserAdmin(UserAdmin):
     # form = UserChangeForm
     # add_form = UserCreationForm
     # change_password_form = AdminPasswordChangeForm
-    list_display = ('email', 'first_name', 'last_name', 'date_of_birth', 'is_staff')
-    list_filter = ('is_staff', 'is_superuser', 'is_active', 'groups')
-    search_fields = ('email', 'date_of_birth', 'first_name', 'last_name')
-    ordering = ('email', 'date_of_birth', 'first_name', 'last_name')
+    list_display = ('email', 'first_name', 'last_name', 'date_of_birth', 'is_staff', "phone_number", "country_code")
+    list_filter = ('is_staff', 'is_superuser', 'is_active', 'groups', "phone_number", "country_code")
+    search_fields = ('email', 'date_of_birth', 'first_name', 'last_name, "phone_number", "country_code"')
+    ordering = ('email', 'date_of_birth', 'first_name', 'last_name', "phone_number", "country_code")
