@@ -17,15 +17,6 @@ services:
     restart: always
     environment:
       - DJANGO_SECRET_KEY=local
-      - ACCOUNT_SID=ACc48e90f3330049e8b8c2d6310799a54f
-      - API_KEY=SKdfc0811aee5d74f3089fcb168399c356
-      - API_KEY_SECRET=VXCIvNyRhOf1I3ipd1u8SwiXBfJe48NB
-      - APP_SID=APe42149306b5831c329fbc5419ff861c3
-      - PUSH_CREDENTIAL_SID=CR35b55c0a2eeb63f0890fbe757b593796
-      - REDIS_URI=redis://localhost:6379
-      - REDIS_URL=redis://redis_db:6379
-      - DEBUG=True
-      - AUTHY_API_KEY=07RY1LIb4Ift8qCf2MCXTZyhsrY5PvZ1
     image: web
     build: ./
     command: >
@@ -49,22 +40,3 @@ services:
       - ./:/code
     ports:
       - "8001:8001"
-#  cron:
-#    restart: always
-#    environment:
-#      - DJANGO_SECRET_KEY=local
-#      - ACCOUNT_SID=ACc48e90f3330049e8b8c2d6310799a54f
-#      - API_KEY=SKdfc0811aee5d74f3089fcb168399c356
-#      - API_KEY_SECRET=VXCIvNyRhOf1I3ipd1u8SwiXBfJe48NB
-#      - APP_SID=APe42149306b5831c329fbc5419ff861c3
-#      - PUSH_CREDENTIAL_SID=CR35b55c0a2eeb63f0890fbe757b593796
-#      - REDIS_URI=redis://localhost:6379
-#      - REDIS_URL=redis://redis_db:6379
-#      - DEBUG=True
-#    build: ./
-#    command: >
-#      bash -c "python cron.py"
-#    volumes:
-#      - ./:/code
-#    depends_on:
-#      - postgres
