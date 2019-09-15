@@ -49,6 +49,8 @@ class User(AbstractUser):
     username = None
     email = models.EmailField(_('email address'), unique=True)
     date_of_birth = models.DateField(null=True)
+    country_code = models.CharField(max_length=512)
+    phone_number = models.CharField(max_length=512)
 
     USERNAME_FIELD = 'email'
     REQUIRED_FIELDS = []
