@@ -8,7 +8,7 @@ import json
 class UserSerializer(serializers.ModelSerializer):
     class Meta:
         model = User
-        fields = ("id", "email", "first_name", "last_name", "date_of_birth")
+        fields = ("id", "email", "first_name", "last_name", "date_of_birth","phone_number", "country_code")
         # read_only_fields = ("email",)
 
 
@@ -29,6 +29,8 @@ class CreateUserSerializer(serializers.ModelSerializer):
             "last_name",
             "date_of_birth",
             "auth_token",
+            "phone_number",
+            "country_code",
         )
         read_only_fields = ("auth_token",)
         extra_kwargs = {"password": {"write_only": True}}

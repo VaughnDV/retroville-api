@@ -86,10 +86,10 @@ def incoming(request):
 @csrf_exempt
 @require_http_methods(["POST"])
 def send_sms(request):
-    country_code = request.POST.get("country_code")
-    phone_number = request.POST.get("phone_number")
+    country_code = request.GET.get("country_code")
+    phone_number = request.GET.get("phone_number")
 
-    if not User.objects.filter(Q(country_code=country_code) & Q(phone_number=phone_number)):
+    if not User.objects.filter(Q(country_code=country_code) and Q(phone_number=phone_number)):
 
         r = api.phones.verification_start(
             phone_number=phone_number,
@@ -97,23 +97,38 @@ def send_sms(request):
             via='sms')
 
         if r.ok():
-            return JsonResponse(success=True, message = r.content['message'])
+            return JsonResponse(data={
+                "success": True,
+                "message": r.content['message']
+            })
         else:
-            return JsonResponse(success=False, message=r.errors()['message'])
-    return JsonResponse(success=False, message="There is an account already associated with this number, please log in.")
+            return JsonResponse(data={
+                "success": False,
+                "message": r.errors()['message']
+            })
+    return JsonResponse(data={
+        "success": True,
+        "message": "There is an account already associated with this number, please log in."
+    })
 
 
 @csrf_exempt
 @require_http_methods(["POST"])
 def validate_sms(request):
-    country_code = request.POST.get("country_code")
-    phone_number = request.POST.get("phone_number")
-    code = request.POST.get("verification_code")
+    country_code = request.GET.get("country_code")
+    phone_number = request.GET.get("phone_number")
+    code = request.GET.get("verification_code")
 
     r = api.phones.verification_check(phone_number, country_code, code)
 
     if r.ok():
-        return JsonResponse(success=True, message=r.content['message'])
+        return JsonResponse(data={
+            "success": True,
+            "message": r.content['message']
+        })
     else:
-        return JsonResponse(success=False, message=r.errors()['message'])
+        return JsonResponse(data={
+            "success": False,
+            "message": r.errors()['message']
+        })
 
