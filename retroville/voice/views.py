@@ -6,6 +6,10 @@ from django.http import HttpResponse, JsonResponse
 from django.views.decorators.csrf import csrf_exempt
 from authy.api import AuthyApiClient
 from django.db.models import Q
+from django.contrib.auth import get_user_model
+
+
+User = get_user_model()
 
 
 AUTHY_API_KEY = os.environ.get('AUTHY_API_KEY')
