@@ -5,18 +5,10 @@ import django
 from datetime import date
 import requests
 import json
-from pprint import pprint
-
 
 sched = BlockingScheduler()
 
-
-# @sched.scheduled_job('cron', day_of_week='mon-sun', hour=00)
-# @sched.scheduled_job('interval', minutes=1)
 def fetch_stories():
-    print("#" * 50)
-    print(date.today())
-    print("#" * 50)
     url = "https://newsapi.org/v2/top-headlines"
     checked = []
     checked_titles = []
@@ -27,6 +19,7 @@ def fetch_stories():
             request_url = f"{url}?country={COUNTRY}&category={category}&sortBy=popularity&language={LANGUAGE}&apiKey={NEWS_API_KEY}"
             title = None
             content = None
+            limit = 10
             index = checked.count(f"{category}")
 
             response = requests.get(request_url)
@@ -37,15 +30,13 @@ def fetch_stories():
                 print(json.loads(response.content)["message"])
                 continue
 
-            while not title and not content:
+            while not title and not content and limit > 0:
                 if articles[index]["title"] and articles[index]["title"] not in checked_titles:
-                    if articles[index]["content"] and len(articles[index]["content"]) > 20:
+                    if articles[index]["url"] and len(articles[index]["url"]) > 20:
                         title = articles[index]["title"]
                         checked_titles.append(title)
-                        content = articles[index]["content"].rstrip()
-                        print("#" * 50)
-                        print(title)
-                        print("#" * 50)
+                        content = articles[index]["url"].rstrip()
+                        limit -= 1
 
             picture_url = articles[index]["urlToImage"]
             live_date = date.today().strftime("%Y-%m-%d")
@@ -67,7 +58,7 @@ if __name__ == '__main__':
     os.environ.setdefault("DJANGO_SETTINGS_MODULE", "retroville.config")
     COUNTRY = os.environ.get("COUNTRY", "gb")
     LANGUAGE = os.environ.get("LANGUAGE", "en")
-    NEWS_API_KEY = os.environ.get("NEWS_API_KEY", "c5c5322336d54e079ba396b59d850e52")
+    NEWS_API_KEY = os.environ.get("NEWS_API_KEY")
     import configurations
     configurations.setup()
     from retroville.stories.models import Story
