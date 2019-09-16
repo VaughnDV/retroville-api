@@ -1,10 +1,11 @@
 from __future__ import absolute_import, unicode_literals
+
 # from celery import shared_task
 import random
 
 from django.contrib.auth import get_user_model
 from django.db.models import Q
-from .models import Match, MatchActivity , Room
+from .models import Match, MatchActivity, Room
 from retroville.stories.models import UserReadStory, Story
 from retroville.voice.tasks import generate_token
 from django.core.serializers import serialize
@@ -14,13 +15,19 @@ from datetime import date
 
 
 User = get_user_model()
-NON_RETURN_FIELDS = ["password", "is_superuser", "is_staff", "groups", "user_permissions"]
+NON_RETURN_FIELDS = [
+    "password",
+    "is_superuser",
+    "is_staff",
+    "groups",
+    "user_permissions",
+]
 
 
 def serialise_data(data):
-    serialized_data = serialize('json', [data, ])
+    serialized_data = serialize("json", [data])
     json_data = json.loads(serialized_data)[0]
-    data = {"id": json_data['pk']}
+    data = {"id": json_data["pk"]}
     for field in json_data["fields"].items():
         if field[0] not in NON_RETURN_FIELDS:
             data.update({field[0]: field[1]})
@@ -38,14 +45,13 @@ def structure_user_data(user, user_stories):
     serialised_user_stories = []
     for i in user_stories:
         s = serialise_data(i)
-        s["interested"] = UserReadStory.objects.filter(user=user, story=i.id).last().interested
+        s["interested"] = (
+            UserReadStory.objects.filter(user=user, story=i.id).last().interested
+        )
         serialised_user_stories.append(s)
 
     return {
-        "user": {
-            "detail": serialise_data(user),
-            "stories": serialised_user_stories
-        }
+        "user": {"detail": serialise_data(user), "stories": serialised_user_stories}
     }
 
 
@@ -57,7 +63,11 @@ def structure_other_users_data(user_stories, other_users_in_room):
         for story in user_stories:
             try:
                 s = serialise_data(story)
-                s["interested"] = UserReadStory.objects.filter(user_id=other.user.id, story=story.id).last().interested
+                s["interested"] = (
+                    UserReadStory.objects.filter(user_id=other.user.id, story=story.id)
+                    .last()
+                    .interested
+                )
 
                 others_stories.append(s)
 
@@ -66,10 +76,11 @@ def structure_other_users_data(user_stories, other_users_in_room):
             except AttributeError:
                 continue
 
-        comparison_data.append({
-            "user": {
-                "detail": serialise_data(User.objects.get(pk=other.user.id)),
-                "stories": others_stories
+        comparison_data.append(
+            {
+                "user": {
+                    "detail": serialise_data(User.objects.get(pk=other.user.id)),
+                    "stories": others_stories,
                 }
             }
         )
@@ -78,10 +89,10 @@ def structure_other_users_data(user_stories, other_users_in_room):
 
 def structure_user_likes(user_data):
     user_likes = list()
-    for j in range(len(user_data['user']['stories'])):
+    for j in range(len(user_data["user"]["stories"])):
 
-        if user_data['user']['stories'][j]['interested']:
-            user_likes.append(user_data['user']['stories'][j]['id'])
+        if user_data["user"]["stories"][j]["interested"]:
+            user_likes.append(user_data["user"]["stories"][j]["id"])
         else:
             continue
     return user_likes
@@ -95,9 +106,9 @@ def match_algorythim(comparison_data, user_likes):
     for i in range(len(comparison_data)):
 
         temp_likes = list()
-        for j in range(len(comparison_data[i]['user']['stories'])):
-            if comparison_data[i]['user']['stories'][j]['interested']:
-                temp_likes.append(comparison_data[i]['user']['stories'][j]['id'])
+        for j in range(len(comparison_data[i]["user"]["stories"])):
+            if comparison_data[i]["user"]["stories"][j]["interested"]:
+                temp_likes.append(comparison_data[i]["user"]["stories"][j]["id"])
             else:
                 continue
 
@@ -105,14 +116,16 @@ def match_algorythim(comparison_data, user_likes):
         union = list(set(temp_likes + user_likes))
 
         coeff_new = len(intersection) / len(union)
-        if (coeff_new > coeff):
-            matched_user = comparison_data[i]['user']['detail']['id']
+        if coeff_new > coeff:
+            matched_user = comparison_data[i]["user"]["detail"]["id"]
             matched_story = random.sample(intersection, 1)
             coeff = coeff_new
             user_no = i
 
-    return matched_story[0] if matched_story else None, \
-        matched_user if matched_story else None
+    return (
+        matched_story[0] if matched_story else None,
+        matched_user if matched_story else None,
+    )
 
 
 def find_match(user, user_stories):
@@ -150,14 +163,13 @@ def match_maker(user_id):
         return {"Message": "Current user not in room!"}
 
     user_stories = Story.objects.filter(
-        userreadstory__user=user,
-        live_date=date.today().strftime("%Y-%m-%d")
+        userreadstory__user=user, live_date=date.today().strftime("%Y-%m-%d")
     )
     if not user_stories:
 
         return {"Message": "There are no user read stories for today! add some?"}
 
-    matched_story,  matched_user = find_match(user, user_stories)
+    matched_story, matched_user = find_match(user, user_stories)
 
     if not matched_user or not matched_story:
         return {"Message": "There are no users to match with at the moment!"}
@@ -167,7 +179,7 @@ def match_maker(user_id):
         caller_access_token=generate_token(matched_user),
         receiver_id=user.id,
         receiver_access_token=generate_token(str(user.id)),
-        matched_story_id=matched_story
+        matched_story_id=matched_story,
     )
 
     activity = MatchActivity.objects.create(
@@ -175,7 +187,7 @@ def match_maker(user_id):
         caller_access_token=generate_token(matched_user),
         receiver_id=user.id,
         receiver_access_token=generate_token(str(user.id)),
-        matched_story_id=matched_story
+        matched_story_id=matched_story,
     )
 
     if not Match.objects.filter(id=match.id).exists():

@@ -18,7 +18,13 @@ class RoomActivityAdmin(admin.ModelAdmin):
 
 @admin.register(Match)
 class MatchAdmin(admin.ModelAdmin):
-    fields = ["caller", "receiver", "caller_access_token", "receiver_access_token", "matched_story"]
+    fields = [
+        "caller",
+        "receiver",
+        "caller_access_token",
+        "receiver_access_token",
+        "matched_story",
+    ]
     list_display = ["caller", "receiver", "matched_story"]
     ordering = ["modified_at", "created_at"]
     list_filter = ["caller", "receiver"]
@@ -27,7 +33,13 @@ class MatchAdmin(admin.ModelAdmin):
 
 @admin.register(MatchActivity)
 class MatchActivityAdmin(admin.ModelAdmin):
-    fields = ["caller", "receiver", "caller_access_token", "receiver_access_token", "matched_story"]
+    fields = [
+        "caller",
+        "receiver",
+        "caller_access_token",
+        "receiver_access_token",
+        "matched_story",
+    ]
     list_display = ["caller", "receiver", "matched_story"]
     ordering = ["modified_at", "created_at"]
     list_filter = ["caller", "receiver"]

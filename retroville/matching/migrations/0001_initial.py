@@ -7,56 +7,79 @@ class Migration(migrations.Migration):
 
     initial = True
 
-    dependencies = [
-    ]
+    dependencies = []
 
     operations = [
         migrations.CreateModel(
-            name='Match',
+            name="Match",
             fields=[
-                ('id', models.AutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('caller_access_token', models.CharField(max_length=1024)),
-                ('receiver_access_token', models.CharField(max_length=1024)),
-                ('created_at', models.DateTimeField(editable=False)),
-                ('modified_at', models.DateTimeField()),
+                (
+                    "id",
+                    models.AutoField(
+                        auto_created=True,
+                        primary_key=True,
+                        serialize=False,
+                        verbose_name="ID",
+                    ),
+                ),
+                ("caller_access_token", models.CharField(max_length=1024)),
+                ("receiver_access_token", models.CharField(max_length=1024)),
+                ("created_at", models.DateTimeField(editable=False)),
+                ("modified_at", models.DateTimeField()),
             ],
-            options={
-                'verbose_name_plural': 'matches',
-            },
+            options={"verbose_name_plural": "matches"},
         ),
         migrations.CreateModel(
-            name='MatchActivity',
+            name="MatchActivity",
             fields=[
-                ('id', models.AutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('caller_access_token', models.CharField(max_length=1024)),
-                ('receiver_access_token', models.CharField(max_length=1024)),
-                ('created_at', models.DateTimeField(editable=False)),
-                ('modified_at', models.DateTimeField()),
+                (
+                    "id",
+                    models.AutoField(
+                        auto_created=True,
+                        primary_key=True,
+                        serialize=False,
+                        verbose_name="ID",
+                    ),
+                ),
+                ("caller_access_token", models.CharField(max_length=1024)),
+                ("receiver_access_token", models.CharField(max_length=1024)),
+                ("created_at", models.DateTimeField(editable=False)),
+                ("modified_at", models.DateTimeField()),
             ],
-            options={
-                'verbose_name_plural': 'match_activity',
-            },
+            options={"verbose_name_plural": "match_activity"},
         ),
         migrations.CreateModel(
-            name='Room',
+            name="Room",
             fields=[
-                ('id', models.AutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('created_at', models.DateTimeField(editable=False)),
-                ('modified_at', models.DateTimeField()),
+                (
+                    "id",
+                    models.AutoField(
+                        auto_created=True,
+                        primary_key=True,
+                        serialize=False,
+                        verbose_name="ID",
+                    ),
+                ),
+                ("created_at", models.DateTimeField(editable=False)),
+                ("modified_at", models.DateTimeField()),
             ],
-            options={
-                'verbose_name_plural': 'room',
-            },
+            options={"verbose_name_plural": "room"},
         ),
         migrations.CreateModel(
-            name='RoomActivity',
+            name="RoomActivity",
             fields=[
-                ('id', models.AutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('created_at', models.DateTimeField(editable=False)),
-                ('modified_at', models.DateTimeField()),
+                (
+                    "id",
+                    models.AutoField(
+                        auto_created=True,
+                        primary_key=True,
+                        serialize=False,
+                        verbose_name="ID",
+                    ),
+                ),
+                ("created_at", models.DateTimeField(editable=False)),
+                ("modified_at", models.DateTimeField()),
             ],
-            options={
-                'verbose_name_plural': 'room_activity',
-            },
+            options={"verbose_name_plural": "room_activity"},
         ),
     ]

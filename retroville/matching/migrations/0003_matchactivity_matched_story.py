@@ -7,15 +7,19 @@ import django.db.models.deletion
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('stories', '0002_auto_20190821_1308'),
-        ('matching', '0002_auto_20190821_1308'),
+        ("stories", "0002_auto_20190821_1308"),
+        ("matching", "0002_auto_20190821_1308"),
     ]
 
     operations = [
         migrations.AddField(
-            model_name='matchactivity',
-            name='matched_story',
-            field=models.ForeignKey(default=7, on_delete=django.db.models.deletion.CASCADE, to='stories.Story'),
+            model_name="matchactivity",
+            name="matched_story",
+            field=models.ForeignKey(
+                default=7,
+                on_delete=django.db.models.deletion.CASCADE,
+                to="stories.Story",
+            ),
             preserve_default=False,
-        ),
+        )
     ]

@@ -15,18 +15,18 @@ User = get_user_model()
 
 
 @csrf_exempt
-@api_view(['GET'])
+@api_view(["GET"])
 def list_room(request):
-    if request.method == 'GET':
+    if request.method == "GET":
         room = Room.objects.all()
         serializer = RoomSerializer(room, many=True)
         return JsonResponse(serializer.data, safe=False)
 
 
 @csrf_exempt
-@api_view(['GET'])
+@api_view(["GET"])
 def check_room(request):
-    if request.method == 'GET':
+    if request.method == "GET":
         room = Room.objects.filter(user=request.user)
         serializer = RoomSerializer(room, many=True)
         return JsonResponse(serializer.data, safe=False)
@@ -34,9 +34,9 @@ def check_room(request):
 
 
 @csrf_exempt
-@api_view(['POST'])
+@api_view(["POST"])
 def enter_room(request):
-    if request.method == 'POST':
+    if request.method == "POST":
         data = {"user": request.user.pk}
         room = Room.objects.filter(user=request.user)
         serializer = RoomSerializer(data=data)
@@ -44,7 +44,9 @@ def enter_room(request):
             if serializer.is_valid(raise_exception=False):
                 pass
             try:
-                return JsonResponse(serializer.data, safe=False, status=status.HTTP_200_OK)
+                return JsonResponse(
+                    serializer.data, safe=False, status=status.HTTP_200_OK
+                )
             except Exception as e:
                 print(e)
 
@@ -55,13 +57,15 @@ def enter_room(request):
 
 
 @csrf_exempt
-@api_view(['PUT'])
+@api_view(["PUT"])
 def update_token(request):
-    if request.method == 'PUT':
+    if request.method == "PUT":
         try:
             room = Room.objects.filter(user=request.user).first()
         except ObjectDoesNotExist:
-            return JsonResponse({"message": "User not in room yet, try POST instead"}, status=400)
+            return JsonResponse(
+                {"message": "User not in room yet, try POST instead"}, status=400
+            )
 
         data = JSONParser().parse(request)
         data["user"] = str(request.user)
@@ -73,20 +77,24 @@ def update_token(request):
 
 
 @csrf_exempt
-@api_view(['DELETE'])
+@api_view(["DELETE"])
 def exit_room(request):
-    if request.method == 'DELETE':
+    if request.method == "DELETE":
         room = Room.objects.filter(user=request.user).first()
         if room:
             room.delete()
-            return JsonResponse({"message": "User has exited room!"}, status=status.HTTP_204_NO_CONTENT)
-        return JsonResponse({"message": "User not found in room!"}, status=status.HTTP_400_BAD_REQUEST)
+            return JsonResponse(
+                {"message": "User has exited room!"}, status=status.HTTP_204_NO_CONTENT
+            )
+        return JsonResponse(
+            {"message": "User not found in room!"}, status=status.HTTP_400_BAD_REQUEST
+        )
 
 
 @csrf_exempt
-@api_view(['GET'])
+@api_view(["GET"])
 def find_match(request):
-    if request.method == 'GET':
+    if request.method == "GET":
         match = match_maker(user_id=request.user.pk)
         if "Message" not in match:
             return JsonResponse(match, status=status.HTTP_201_CREATED, safe=False)
@@ -94,24 +102,31 @@ def find_match(request):
         return JsonResponse(match, status=status.HTTP_204_NO_CONTENT)
 
 
-
 @csrf_exempt
-@api_view(['DELETE'])
+@api_view(["DELETE"])
 def delete_match(request):
-    if request.method == 'DELETE':
-        match = Match.objects.filter(Q(caller=request.user) | Q(receiver=request.user)).first()
+    if request.method == "DELETE":
+        match = Match.objects.filter(
+            Q(caller=request.user) | Q(receiver=request.user)
+        ).first()
         if match:
             match.delete()
-            return JsonResponse({"message": "Match deleted"}, status=status.HTTP_204_NO_CONTENT)
-        return JsonResponse({"message": "Match not found!"}, status=status.HTTP_400_BAD_REQUEST)
+            return JsonResponse(
+                {"message": "Match deleted"}, status=status.HTTP_204_NO_CONTENT
+            )
+        return JsonResponse(
+            {"message": "Match not found!"}, status=status.HTTP_400_BAD_REQUEST
+        )
 
 
 @csrf_exempt
-@api_view(['GET'])
+@api_view(["GET"])
 def check_match(request):
-    if request.method == 'GET':
-        match_id = request.GET.get('match_id', '')
+    if request.method == "GET":
+        match_id = request.GET.get("match_id", "")
         match_exists = Match.objects.filter(id=match_id).exists()
         if match_exists:
             return JsonResponse({"message": "Match exists!"}, status=status.HTTP_200_OK)
-        return JsonResponse({"message": "Match not found!"}, status=status.HTTP_404_NOT_FOUND)
+        return JsonResponse(
+            {"message": "Match not found!"}, status=status.HTTP_404_NOT_FOUND
+        )

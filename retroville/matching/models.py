@@ -6,7 +6,9 @@ from retroville.stories.models import Story
 
 class Room(models.Model):
 
-    user = models.OneToOneField(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name='+')
+    user = models.OneToOneField(
+        settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name="+"
+    )
     created_at = models.DateTimeField(editable=False)
     modified_at = models.DateTimeField()
 
@@ -26,9 +28,13 @@ class Room(models.Model):
 
 class Match(models.Model):
 
-    caller = models.OneToOneField(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name='+')
+    caller = models.OneToOneField(
+        settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name="+"
+    )
     caller_access_token = models.CharField(max_length=1024)
-    receiver = models.OneToOneField(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name='+')
+    receiver = models.OneToOneField(
+        settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name="+"
+    )
     receiver_access_token = models.CharField(max_length=1024)
     matched_story = models.ForeignKey(Story, on_delete=models.CASCADE)
     created_at = models.DateTimeField(editable=False)
@@ -67,9 +73,13 @@ class RoomActivity(models.Model):
 
 class MatchActivity(models.Model):
 
-    caller = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name='+')
+    caller = models.ForeignKey(
+        settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name="+"
+    )
     caller_access_token = models.CharField(max_length=1024)
-    receiver = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name='+')
+    receiver = models.ForeignKey(
+        settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name="+"
+    )
     receiver_access_token = models.CharField(max_length=1024)
     matched_story = models.ForeignKey(Story, on_delete=models.CASCADE)
     created_at = models.DateTimeField(editable=False)

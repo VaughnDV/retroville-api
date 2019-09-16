@@ -5,20 +5,18 @@ from django.db import migrations, models
 
 class Migration(migrations.Migration):
 
-    dependencies = [
-        ('users', '0001_initial'),
-    ]
+    dependencies = [("users", "0001_initial")]
 
     operations = [
         migrations.AddField(
-            model_name='user',
-            name='country_code',
+            model_name="user",
+            name="country_code",
             field=models.CharField(default=44, max_length=512),
             preserve_default=False,
         ),
         migrations.AddField(
-            model_name='user',
-            name='phone_number',
+            model_name="user",
+            name="phone_number",
             field=models.CharField(default=1234567890, max_length=512),
             preserve_default=False,
         ),
