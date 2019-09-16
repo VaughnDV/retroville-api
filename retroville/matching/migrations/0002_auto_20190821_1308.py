@@ -10,45 +10,69 @@ class Migration(migrations.Migration):
     initial = True
 
     dependencies = [
-        ('stories', '0001_initial'),
+        ("stories", "0001_initial"),
         migrations.swappable_dependency(settings.AUTH_USER_MODEL),
-        ('matching', '0001_initial'),
+        ("matching", "0001_initial"),
     ]
 
     operations = [
         migrations.AddField(
-            model_name='roomactivity',
-            name='user',
-            field=models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to=settings.AUTH_USER_MODEL),
+            model_name="roomactivity",
+            name="user",
+            field=models.ForeignKey(
+                on_delete=django.db.models.deletion.CASCADE, to=settings.AUTH_USER_MODEL
+            ),
         ),
         migrations.AddField(
-            model_name='room',
-            name='user',
-            field=models.OneToOneField(on_delete=django.db.models.deletion.CASCADE, related_name='+', to=settings.AUTH_USER_MODEL),
+            model_name="room",
+            name="user",
+            field=models.OneToOneField(
+                on_delete=django.db.models.deletion.CASCADE,
+                related_name="+",
+                to=settings.AUTH_USER_MODEL,
+            ),
         ),
         migrations.AddField(
-            model_name='matchactivity',
-            name='caller',
-            field=models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, related_name='+', to=settings.AUTH_USER_MODEL),
+            model_name="matchactivity",
+            name="caller",
+            field=models.ForeignKey(
+                on_delete=django.db.models.deletion.CASCADE,
+                related_name="+",
+                to=settings.AUTH_USER_MODEL,
+            ),
         ),
         migrations.AddField(
-            model_name='matchactivity',
-            name='receiver',
-            field=models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, related_name='+', to=settings.AUTH_USER_MODEL),
+            model_name="matchactivity",
+            name="receiver",
+            field=models.ForeignKey(
+                on_delete=django.db.models.deletion.CASCADE,
+                related_name="+",
+                to=settings.AUTH_USER_MODEL,
+            ),
         ),
         migrations.AddField(
-            model_name='match',
-            name='caller',
-            field=models.OneToOneField(on_delete=django.db.models.deletion.CASCADE, related_name='+', to=settings.AUTH_USER_MODEL),
+            model_name="match",
+            name="caller",
+            field=models.OneToOneField(
+                on_delete=django.db.models.deletion.CASCADE,
+                related_name="+",
+                to=settings.AUTH_USER_MODEL,
+            ),
         ),
         migrations.AddField(
-            model_name='match',
-            name='matched_story',
-            field=models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to='stories.Story'),
+            model_name="match",
+            name="matched_story",
+            field=models.ForeignKey(
+                on_delete=django.db.models.deletion.CASCADE, to="stories.Story"
+            ),
         ),
         migrations.AddField(
-            model_name='match',
-            name='receiver',
-            field=models.OneToOneField(on_delete=django.db.models.deletion.CASCADE, related_name='+', to=settings.AUTH_USER_MODEL),
+            model_name="match",
+            name="receiver",
+            field=models.OneToOneField(
+                on_delete=django.db.models.deletion.CASCADE,
+                related_name="+",
+                to=settings.AUTH_USER_MODEL,
+            ),
         ),
     ]

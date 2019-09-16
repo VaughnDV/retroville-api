@@ -16,18 +16,18 @@ from datetime import date
 
 
 @csrf_exempt
-@api_view(['POST'])
+@api_view(["POST"])
 def stories(request):
-    if request.method == 'POST':
+    if request.method == "POST":
         stories = Story.objects.filter(live_date=request.data["live_date"])
-        serializer = StorySerializer(stories, context={'request': request}, many=True)
+        serializer = StorySerializer(stories, context={"request": request}, many=True)
         return JsonResponse({"results": serializer.data}, safe=False)
 
 
 @csrf_exempt
-@api_view(['POST'])
+@api_view(["POST"])
 def read_story(request):
-    if request.method == 'POST':
+    if request.method == "POST":
         data = JSONParser().parse(request)
         data["user"] = str(request.user)
         serializer = UserReadStorySerializer(data=data)
@@ -35,4 +35,3 @@ def read_story(request):
             serializer.save()
             return JsonResponse(serializer.data, status=status.HTTP_201_CREATED)
         return JsonResponse(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-

@@ -2,6 +2,7 @@ import os
 from retroville.config.common import Common
 import dj_database_url
 
+
 class Production(Common):
     INSTALLED_APPS = Common.INSTALLED_APPS
     SECRET_KEY = os.getenv("DJANGO_SECRET_KEY")
@@ -29,4 +30,3 @@ class Production(Common):
     # 86400 = (60 seconds x 60 minutes x 24 hours)
 
     AWS_HEADERS = {"Cache-Control": "max-age=86400, s-maxage=86400, must-revalidate"}
-

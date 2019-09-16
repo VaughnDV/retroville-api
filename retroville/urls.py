@@ -11,14 +11,23 @@ from .voice.views import incoming
 from .voice.views import make_call
 from .voice.views import place_call
 from .voice.views import ping, send_sms, validate_sms
-from .matching.views import enter_room, update_token, check_room, exit_room, list_room, find_match, delete_match, check_match
+from .matching.views import (
+    enter_room,
+    update_token,
+    check_room,
+    exit_room,
+    list_room,
+    find_match,
+    delete_match,
+    check_match,
+)
 from .users.views import who_am_i
 from django.contrib.auth import views as auth_views
 
 
-admin.site.site_header = 'Retroville'
-admin.site.site_title = 'Retroville Admin Panel'
-admin.site.index_title = 'Retroville'
+admin.site.site_header = "Retroville"
+admin.site.site_title = "Retroville Admin Panel"
+admin.site.index_title = "Retroville"
 
 router = DefaultRouter()
 router.register(r"users", UserViewSet)
@@ -53,5 +62,4 @@ urlpatterns = [
     path("api/v1/whoami/", who_am_i, name="who_am_i"),
     path("api/v1/stories/read/", read_story, name="read_story"),
     path("api/v1/stories/", stories, name="stories"),
-
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

@@ -8,30 +8,42 @@ class Migration(migrations.Migration):
 
     initial = True
 
-    dependencies = [
-    ]
+    dependencies = []
 
     operations = [
         migrations.CreateModel(
-            name='Story',
+            name="Story",
             fields=[
-                ('id', models.AutoField(primary_key=True, serialize=False)),
-                ('title', models.CharField(max_length=512)),
-                ('content', models.CharField(max_length=2048)),
-                ('picture_url', models.CharField(max_length=512)),
-                ('created_at', models.DateTimeField(editable=False)),
-                ('modified_at', models.DateTimeField()),
-                ('live_date', models.DateField(default=None)),
+                ("id", models.AutoField(primary_key=True, serialize=False)),
+                ("title", models.CharField(max_length=512)),
+                ("content", models.CharField(max_length=2048)),
+                ("picture_url", models.CharField(max_length=512)),
+                ("created_at", models.DateTimeField(editable=False)),
+                ("modified_at", models.DateTimeField()),
+                ("live_date", models.DateField(default=None)),
             ],
         ),
         migrations.CreateModel(
-            name='UserReadStory',
+            name="UserReadStory",
             fields=[
-                ('id', models.AutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('created_at', models.DateField(editable=False)),
-                ('interested', models.BooleanField()),
-                ('modified_at', models.DateTimeField()),
-                ('story', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to='stories.Story')),
+                (
+                    "id",
+                    models.AutoField(
+                        auto_created=True,
+                        primary_key=True,
+                        serialize=False,
+                        verbose_name="ID",
+                    ),
+                ),
+                ("created_at", models.DateField(editable=False)),
+                ("interested", models.BooleanField()),
+                ("modified_at", models.DateTimeField()),
+                (
+                    "story",
+                    models.ForeignKey(
+                        on_delete=django.db.models.deletion.CASCADE, to="stories.Story"
+                    ),
+                ),
             ],
         ),
     ]

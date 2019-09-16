@@ -8,7 +8,15 @@ import json
 class UserSerializer(serializers.ModelSerializer):
     class Meta:
         model = User
-        fields = ("id", "email", "first_name", "last_name", "date_of_birth","phone_number", "country_code")
+        fields = (
+            "id",
+            "email",
+            "first_name",
+            "last_name",
+            "date_of_birth",
+            "phone_number",
+            "country_code",
+        )
         # read_only_fields = ("email",)
 
 
@@ -37,13 +45,19 @@ class CreateUserSerializer(serializers.ModelSerializer):
 
 
 User = get_user_model()
-NON_RETURN_FIELDS = ["password", "is_superuser", "is_staff", "groups", "user_permissions"]
+NON_RETURN_FIELDS = [
+    "password",
+    "is_superuser",
+    "is_staff",
+    "groups",
+    "user_permissions",
+]
 
 
 def serialise_data(data):
-    serialized_data = serialize('json', [data, ])
+    serialized_data = serialize("json", [data])
     json_data = json.loads(serialized_data)[0]
-    data = {"id": json_data['pk']}
+    data = {"id": json_data["pk"]}
     for field in json_data["fields"].items():
         if field[0] not in NON_RETURN_FIELDS:
             data.update({field[0]: field[1]})

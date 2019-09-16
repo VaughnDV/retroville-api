@@ -8,6 +8,7 @@ import json
 
 sched = BlockingScheduler()
 
+
 def fetch_stories():
     url = "https://newsapi.org/v2/top-headlines"
     checked = []
@@ -17,7 +18,18 @@ def fetch_stories():
     api_calls = 0
     response_statuses = []
 
-    categories = ["business", "business", "health", "health", "technology", "science", "sports", "entertainment", "general", "general",]
+    categories = [
+        "business",
+        "business",
+        "health",
+        "health",
+        "technology",
+        "science",
+        "sports",
+        "entertainment",
+        "general",
+        "general",
+    ]
 
     for category in categories:
         title = None
@@ -56,7 +68,7 @@ def fetch_stories():
                         title=title,
                         content=content,
                         picture_url=picture_url,
-                        live_date=date.today().strftime("%Y-%m-%d")
+                        live_date=date.today().strftime("%Y-%m-%d"),
                     )
                     created_count += 1
                     checked_titles.append(title)
@@ -76,8 +88,7 @@ def fetch_stories():
         print(error)
 
 
-
-if __name__ == '__main__':
+if __name__ == "__main__":
     sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
     os.environ.setdefault("DJANGO_CONFIGURATION", "Local")
     os.environ.setdefault("DJANGO_SETTINGS_MODULE", "retroville.config")
@@ -85,7 +96,9 @@ if __name__ == '__main__':
     LANGUAGE = os.environ.get("LANGUAGE", "en")
     NEWS_API_KEY = os.environ.get("NEWS_API_KEY")
     import configurations
+
     configurations.setup()
     from retroville.stories.models import Story
+
     django.setup()
     fetch_stories()

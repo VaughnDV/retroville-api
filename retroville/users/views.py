@@ -31,8 +31,8 @@ class UserCreateViewSet(mixins.CreateModelMixin, viewsets.GenericViewSet):
 
 
 @csrf_exempt
-@api_view(['GET'])
+@api_view(["GET"])
 def who_am_i(request):
-    if request.method == 'GET':
+    if request.method == "GET":
         user = get_user(user_id=request.user.pk)
         return JsonResponse(user, status=status.HTTP_200_OK, safe=False)

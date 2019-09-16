@@ -13,7 +13,7 @@ class Common(Configuration):
     INSTALLED_APPS = (
         # 'channels',
         # 'retroville.chat',
-        'retroville.config.suit.SuitConfig',
+        "retroville.config.suit.SuitConfig",
         "django.contrib.admin",
         "django.contrib.auth",
         "django.contrib.contenttypes",
@@ -25,11 +25,11 @@ class Common(Configuration):
         "rest_framework.authtoken",  # token authentication
         "django_filters",  # for filtering rest endpoints
         # Your apps
-        'django_rest_passwordreset',
-        'retroville.users',
-        'retroville.stories',
-        'retroville.voice',
-        'retroville.matching',
+        "django_rest_passwordreset",
+        "retroville.users",
+        "retroville.stories",
+        "retroville.voice",
+        "retroville.matching",
     )
 
     # https://docs.djangoproject.com/en/2.0/topics/http/middleware/
@@ -93,9 +93,7 @@ class Common(Configuration):
         {
             "BACKEND": "django.template.backends.django.DjangoTemplates",
             # "DIRS": STATICFILES_DIRS,
-            'DIRS': [
-                os.path.join(BASE_DIR, 'templates'),
-            ],
+            "DIRS": [os.path.join(BASE_DIR, "templates")],
             "APP_DIRS": True,
             "OPTIONS": {
                 "context_processors": [
@@ -108,9 +106,7 @@ class Common(Configuration):
         }
     ]
 
-    TEMPLATE_DIRS = (
-        os.path.join(BASE_DIR, 'retroville/templates'),
-    )
+    TEMPLATE_DIRS = (os.path.join(BASE_DIR, "retroville/templates"),)
 
     # Set DEBUG to False as a default for safety
     # https://docs.djangoproject.com/en/dev/ref/settings/#debug
@@ -180,7 +176,9 @@ class Common(Configuration):
 
     # Django Rest Framework
     REST_FRAMEWORK = {
-        'DEFAULT_FILTER_BACKENDS': ['django_filters.rest_framework.DjangoFilterBackend'],
+        "DEFAULT_FILTER_BACKENDS": [
+            "django_filters.rest_framework.DjangoFilterBackend"
+        ],
         "DEFAULT_PAGINATION_CLASS": "rest_framework.pagination.PageNumberPagination",
         "PAGE_SIZE": int(os.getenv("DJANGO_PAGINATION_LIMIT", 10)),
         "DATETIME_FORMAT": "%Y-%m-%dT%H:%M:%S%z",
