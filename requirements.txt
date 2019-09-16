@@ -73,3 +73,4 @@ urllib3==1.25.3
 wcwidth==0.1.7
 APScheduler==3.0.0
 authy==2.2.3
+python-dotenv
