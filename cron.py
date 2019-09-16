@@ -12,19 +12,28 @@ def fetch_stories():
     url = "https://newsapi.org/v2/top-headlines"
     checked = []
     checked_titles = []
-    categories = ["business", "business", "health", "health", "technology", "science", "sports", "entertainment", "general", "general"]
-    count = 0
-    while count <= 10:
-        for category in categories:
+    errors = []
+    created_count = 0
+    api_calls = 0
+    response_statuses = []
+
+    categories = ["business", "business", "health", "health", "technology", "science", "sports", "entertainment", "general", "general",]
+
+    for category in categories:
+        title = None
+        content = None
+        picture_url = None
+
+        while created_count < 10:
             try:
                 request_url = f"{url}?country={COUNTRY}&category={category}&sortBy=popularity&language={LANGUAGE}&apiKey={NEWS_API_KEY}"
-                title = None
-                content = None
-                limit = 10
+
                 index = checked.count(f"{category}")
-
+                checked.append(category)
                 response = requests.get(request_url)
+                api_calls += 1
 
+                response_statuses.append(response.status_code)
                 if not response.ok:
                     print(response.reason)
                     print(response.status_code)
@@ -36,29 +45,36 @@ def fetch_stories():
                     print(json.loads(response.content)["message"])
                     continue
 
-                while not title and not content and limit > 0:
-                    if articles[index]["title"] and articles[index]["title"] not in checked_titles:
-                        if articles[index]["url"]:
-                            title = articles[index]["title"]
-                            checked_titles.append(title)
-                            content = articles[index]["url"]
-                            limit -= 1
+                if articles[index]["title"] not in checked_titles:
+                    if articles[index]["url"]:
+                        title = articles[index]["title"]
+                        content = articles[index]["url"]
+                        picture_url = articles[index]["urlToImage"]
 
-                picture_url = articles[index]["urlToImage"]
-                live_date = date.today().strftime("%Y-%m-%d")
-
-                Story.objects.create(
-                    title=title,
-                    content=content,
-                    picture_url=picture_url,
-                    live_date=live_date
-                )
-                checked.append(category)
-                count += 1
+                if title and content and picture_url:
+                    Story.objects.create(
+                        title=title,
+                        content=content,
+                        picture_url=picture_url,
+                        live_date=date.today().strftime("%Y-%m-%d")
+                    )
+                    created_count += 1
+                    checked_titles.append(title)
 
             except Exception as e:
-                print(e)
+                errors.append(e)
                 continue
+
+    print(f"Total requests to News API: {api_calls}:")
+    print(f"created_count: {created_count}")
+    print(f"response_statuses: {response_statuses}")
+    print("Created Titles:")
+    for title in checked_titles:
+        print(title)
+    print("Errors:")
+    for error in errors:
+        print(error)
+
 
 
 if __name__ == '__main__':
