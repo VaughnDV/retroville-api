@@ -1,17 +1,31 @@
-# retroville-api
+# Retroville API
 
-[![Build Status](https://travis-ci.org/VaughnDV/retroville-api.svg?branch=master)](https://travis-ci.org/VaughnDV/retroville-api)
-[![Built with](https://img.shields.io/badge/Built_with-Cookiecutter_Django_Rest-F7B633.svg)](https://github.com/agconti/cookiecutter-django-rest)
-
-Connecting people with similar interests. Check out the project's [documentation](http://VaughnDV.github.io/retroville-api/).
-
-# Prerequisites
+## Prerequisites
 
 - [Docker](https://docs.docker.com/docker-for-mac/install/)  
-- [Travis CLI](http://blog.travis-ci.com/2013-01-14-new-client/)
 - [Heroku Toolbelt](https://toolbelt.heroku.com/)
 
-# Local Development
+## Local Development
+
+create a `.env` file in the root directory where `manage.py` lives, and populate the following:
+```DJANGO_SETTINGS_MODULE=retroville.config 
+DJANGO_CONFIGURATION=Local
+DJANGO_SECRET_KEY=Local
+ACCOUNT_SID=
+API_KEY=
+API_KEY_SECRET=
+APP_SID=
+PUSH_CREDENTIAL_SID=
+REDIS_URL=redis://redis_db:6379
+DEBUG=True
+AUTHY_API_KEY=
+NEWS_API_KEY=
+```
+
+Build for local development:
+```bash
+docker-compose build
+```
 
 Start the dev server for local development:
 ```bash
@@ -24,52 +38,43 @@ Run a command inside the docker container:
 docker-compose run --rm web [command]
 ```
 
-# Continuous Deployment
 
-Deployment is automated via Travis. When builds pass on the master or qa branch, Travis will deploy that branch to Heroku. Follow these steps to enable this feature.
+## Deployment
 
-Initialize the production server:
+Make sure your changes are committed on Git...
 
-```
-heroku create retroville-prod --remote prod && \
-    heroku addons:create newrelic:wayne --app retroville-prod && \
-    heroku addons:create heroku-postgresql:hobby-dev --app retroville-prod && \
-    heroku config:set DJANGO_SECRET_KEY=`openssl rand -base64 32` \
-        DJANGO_AWS_ACCESS_KEY_ID="Add your id" \
-        DJANGO_AWS_SECRET_ACCESS_KEY="Add your key" \
-        DJANGO_AWS_STORAGE_BUCKET_NAME="retroville-prod" \
-        DJANGO_CONFIGURATION="Production" \
-        DJANGO_SETTINGS_MODULE="retroville.config" \
-        --app retroville-prod
-```
-
-Initialize the qa server:
-
-```
-heroku create retroville-qa --remote qa && \
-    heroku addons:create newrelic:wayne --app retroville-qa && \
-    heroku addons:create heroku-postgresql:hobby-dev --app retroville-qa && \
-    heroku config:set DJANGO_SECRET_KEY=`openssl rand -base64 32` \
-        DJANGO_AWS_ACCESS_KEY_ID="Add your id" \
-        DJANGO_AWS_SECRET_ACCESS_KEY="Add your key" \
-        DJANGO_AWS_STORAGE_BUCKET_NAME="retroville-qa" \
-        DJANGO_CONFIGURATION="Production" \
-        DJANGO_SETTINGS_MODULE="retroville.config" \
-        --app retroville-qa
-```
-
-Securely add your Heroku credentials to Travis so that it can automatically deploy your changes:
-
+Login to Heroku
 ```bash
-travis encrypt HEROKU_AUTH_TOKEN="$(heroku auth:token)" --add
+heroku login
 ```
 
-Commit your changes and push to master and qa to trigger your first deploys:
-
+Login to Heroku containers
 ```bash
-git commit -a -m "ci(travis): add Heroku credentials" && \
-git push origin master:qa && \
-git push origin master
+heroku container:login
 ```
 
-You're now ready to continuously ship! ✨ 💅 🛳
+Push changes to Heroku STAGE
+```bash
+heroku container:push web --remote stage
+```
+
+Release on Heroku STAGE
+```bash
+heroku container:release web --remote stage
+```
+
+RELEASED!!! :D
+
+## Other 
+
+Sometime you may need to work on the server:
+```bash
+heroku run bash --remote stage
+```
+
+Sometime you may need to see the logs on the server:
+```bash
+heroku logs -t --remote stage
+```
+
+Note that we have two environments, `stage` and `production`
