@@ -9,7 +9,6 @@ from retroville.matching.views import (
     list_room,
     enter_room,
     find_match,
-    delete_match,
 )
 import json
 from datetime import date
@@ -91,40 +90,45 @@ class TestMatchAlgorithm(APITestCase):
         request.user = User.objects.all().first()
         response = find_match(request)
         assert Match.objects.filter(
-            Q(caller=self.caller) | Q(receiver=self.receiver)
+            Q(caller=request.user) | Q(receiver=request.user)
+        ).exists()
+
+    def test_match_activity_is_created(self):
+        request = RequestFactory().get(reverse("find_match"))
+        request.user = User.objects.all().first()
+        response = find_match(request)
+        assert MatchActivity.objects.filter(
+            Q(caller=request.user) | Q(receiver=request.user)
         ).exists()
 
     def test_user_in_room_is_deleted_after_match(self):
         request = RequestFactory().get(reverse("find_match"))
         request.user = User.objects.all().first()
         response = find_match(request)
-
         assert not Room.objects.filter(
-            Q(user=self.caller) | Q(user=self.receiver)
+            Q(user=request.user) | Q(user=request.user)
         ).exists()
 
     def test_no_user_users_to_match_with_no_other_user_in_room(self):
         request = RequestFactory().get(reverse("find_match"))
         request.user = self.caller
-        self.receiver.delete()
+        Room.objects.exclude(user=request.user).delete()
         response = find_match(request)
+        assert response.status_code == 204
         assert (
             json.loads(response.content)["Message"]
             == "There are no users to match with at the moment!"
         )
-        assert response.status_code == 204
 
     def test_no_user_users_to_match_with_no_stories_read(self):
-        for item in UserReadStory.objects.filter(user=self.receiver):
-            item.delete()
-
+        UserReadStory.objects.exclude(user=self.receiver).delete()
         request = RequestFactory().get(reverse("find_match"))
         request.user = self.caller
         response = find_match(request)
         print(response.content)
         assert (
             json.loads(response.content)["Message"]
-            == "There are no users to match with at the moment!"
+            == "There are no user read stories for today! add some?"
         )
         assert response.status_code == 204
 
@@ -187,7 +191,6 @@ class TestMatchView(APITestCase):
         assert json.loads(response.content)["Message"] == "Current user not in room!"
         assert response.status_code == 204
 
-    #
     def test_no_user_users_to_match_with_no_stories_read(self):
         Room.objects.create(user=self.caller)
         Room.objects.create(user=self.receiver)
@@ -203,73 +206,6 @@ class TestMatchView(APITestCase):
         )
         assert response.status_code == 204
 
-    # def test_match_is_created(self):
-    #     Room.objects.create(
-    #         user=self.caller
-    #     )
-    #     Room.objects.create(
-    #         user=self.receiver
-    #     )
-    #     request = RequestFactory().get(reverse("find_match"))
-    #     request.user = self.caller
-    #     response = find_match(request)
-    #
-    #     assert Match.objects.filter(caller=self.caller, receiver=self.receiver).exists()
-
-
-#
-#     def test_user_in_room_is_deleted_after_match(self):
-#         Room.objects.create(
-#             user=self.caller
-#         )
-#         Room.objects.create(
-#             user=self.receiver
-#         )
-#         request = RequestFactory().get(reverse("find_match"))
-#         request.user = self.caller
-#         response = find_match(request)
-#
-#         assert not Room.objects.filter(Q(user=self.caller) | Q(user=self.receiver)).exists()
-#
-#     def test_match_activity_is_created(self):
-#         Room.objects.create(
-#             user=self.caller
-#         )
-#         Room.objects.create(
-#             user=self.receiver
-#         )
-#         request = RequestFactory().get(reverse("find_match"))
-#         request.user = self.caller
-#         response = find_match(request)
-#
-#         assert MatchActivity.objects.filter(caller=self.caller, receiver=self.receiver).exists()
-#
-#     def test_match_activity_is_created(self):
-#         Room.objects.create(
-#             user=self.caller
-#         )
-#         Room.objects.create(
-#             user=self.receiver
-#         )
-#         request = RequestFactory().get(reverse("find_match"))
-#         request.user = self.caller
-#         response = find_match(request)
-#
-#         assert MatchActivity.objects.filter(caller=self.caller, receiver=self.receiver).exists()
-#
-#     def test_room_activity_is_created(self):
-#         Room.objects.create(
-#             user=self.caller
-#         )
-#         Room.objects.create(
-#             user=self.receiver
-#         )
-#         request = RequestFactory().get(reverse("find_match"))
-#         request.user = self.caller
-#         response = find_match(request)
-#
-#         assert RoomActivity.objects.filter(Q(user=self.caller) | Q(user=self.receiver)).exists()
-
 
 class TestRoomView(APITestCase):
     """Testing check_room, exit_room, list_room, enter_room,"""
@@ -279,6 +215,11 @@ class TestRoomView(APITestCase):
 
         self.user = User.objects.create_user(
             email="caller@jumanji.com",
+            password="password123",
+            date_of_birth=random_date("1920-01-01", "1970-01-01"),
+        )
+        self.other = User.objects.create_user(
+            email="other@jumanji.com",
             password="password123",
             date_of_birth=random_date("1920-01-01", "1970-01-01"),
         )
@@ -320,5 +261,24 @@ class TestRoomView(APITestCase):
         )
         request.user = self.user
         response = exit_room(request)
-        assert Room.objects.filter(user=self.user).exists() == False
+        assert not Room.objects.filter(user=self.user).exists()
         assert response.status_code == 204
+
+    def test_user_in_room_activity_is_created(self):
+        request = APIRequestFactory(enforce_csrf_checks=False).post(
+            reverse("enter_room")
+        )
+        request.user = self.user
+        response = enter_room(request)
+        assert RoomActivity.objects.filter(user=request.user).exists()
+        assert response.status_code == 201
+
+    def test_list_room_lists_users_in_room(self):
+        Room.objects.all().delete()
+        Room.objects.create(user=self.user)
+        Room.objects.create(user=self.other)
+        request = APIRequestFactory(enforce_csrf_checks=False).get(reverse("list_room"))
+        request.user = self.user
+        response = list_room(request)
+        assert Room.objects.count() == 2
+        assert response.status_code == 200
