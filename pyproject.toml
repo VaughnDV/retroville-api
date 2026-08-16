@@ -29,7 +29,7 @@ python-dotenv = "^1.1.0"
 structlog = "^25.4.0"
 drf-spectacular = "^0.28.0"
 whitenoise = "^6.9.0"
-django-redis = "^5.4.0"
+django-redis = ">=5.4,<8.0"
 asgiref = "^3.8.0"
 
 [tool.poetry.group.dev.dependencies]
