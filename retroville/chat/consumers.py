@@ -1,3 +1,14 @@
+"""
+WebSocket chat.
+
+- Authentication: DRF token in `Authorization: Token ...` or `?token=`.
+- Origin: `AllowedHostsOriginValidator` using `ALLOWED_HOSTS`.
+- Message size: `WEBSOCKET_MAX_MESSAGE_BYTES` (default 4096). Oversize closes 4408.
+- Reconnect: clients should reconnect to the same `ws/chat/<room>/` URL with a
+  fresh token; membership is re-joined on `connect`. There is no server-side
+  backlog; missed messages are not replayed.
+"""
+
 import json
 
 from channels.generic.websocket import AsyncWebsocketConsumer

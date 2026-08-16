@@ -1,191 +1,73 @@
-from __future__ import absolute_import, unicode_literals
+"""Celery wrappers. Domain work lives in services/providers; these tasks are retry-safe."""
 
-# from celery import shared_task
+from __future__ import annotations
 
-from django.contrib.auth import get_user_model
-from django.db.models import Q
-from .models import Match, MatchActivity, Room
-from .domain import Candidate, liked_story_ids, select_match as domain_select_match
-from retroville.stories.models import UserReadStory, Story
-from retroville.voice.tasks import generate_token
-from django.core.serializers import serialize
-from django.core.exceptions import ObjectDoesNotExist
-import json
+import logging
 from datetime import date
 
+from celery import shared_task
+from django.utils import timezone
 
-User = get_user_model()
-NON_RETURN_FIELDS = [
-    "password",
-    "is_superuser",
-    "is_staff",
-    "groups",
-    "user_permissions",
-]
+from retroville.matching.services import MatchServiceError, request_match
+from retroville.providers.news import get_news_provider
+from retroville.stories.models import Story
 
-
-def serialise_data(data):
-    serialized_data = serialize("json", [data])
-    json_data = json.loads(serialized_data)[0]
-    data = {"id": json_data["pk"]}
-    for field in json_data["fields"].items():
-        if field[0] not in NON_RETURN_FIELDS:
-            data.update({field[0]: field[1]})
-    return data
+logger = logging.getLogger(__name__)
 
 
-def fetch_detail(match):
-    match["story"] = serialise_data(Story.objects.get(id=match["matched_story"]))
-    match["caller"] = serialise_data(User.objects.get(id=match["caller"]))
-    match["receiver"] = serialise_data(User.objects.get(id=match["receiver"]))
-    return match
+class TransientProviderError(Exception):
+    """Retryable provider/network failure."""
 
 
-def structure_user_data(user, user_stories):
-    serialised_user_stories = []
-    for i in user_stories:
-        s = serialise_data(i)
-        s["interested"] = (
-            UserReadStory.objects.filter(user=user, story=i.id).last().interested
-        )
-        serialised_user_stories.append(s)
-
-    return {
-        "user": {"detail": serialise_data(user), "stories": serialised_user_stories}
-    }
-
-
-def structure_other_users_data(user_stories, other_users_in_room):
-    comparison_data = []
-
-    for other in other_users_in_room:
-        others_stories = []
-        for story in user_stories:
-            try:
-                s = serialise_data(story)
-                s["interested"] = (
-                    UserReadStory.objects.filter(user_id=other.user.id, story=story.id)
-                    .last()
-                    .interested
-                )
-
-                others_stories.append(s)
-
-            except ObjectDoesNotExist:
-                continue
-            except AttributeError:
-                continue
-
-        comparison_data.append(
-            {
-                "user": {
-                    "detail": serialise_data(User.objects.get(pk=other.user.id)),
-                    "stories": others_stories,
-                }
-            }
-        )
-    return comparison_data
-
-
-def structure_user_likes(user_data):
-    user_likes = list()
-    for j in range(len(user_data["user"]["stories"])):
-
-        if user_data["user"]["stories"][j]["interested"]:
-            user_likes.append(user_data["user"]["stories"][j]["id"])
-        else:
-            continue
-    return user_likes
-
-
-def match_algorythim(comparison_data, user_likes):
-    candidates = [
-        Candidate(
-            user_id=item["user"]["detail"]["id"],
-            liked_story_ids=frozenset(liked_story_ids(item["user"]["stories"])),
-        )
-        for item in comparison_data
-    ]
-    return domain_select_match(user_likes, candidates)
-
-
-def find_match(user, user_stories):
-
-    user_data = structure_user_data(user, user_stories)
-
-    user_likes = structure_user_likes(user_data)
-
-    other_users_in_room = Room.objects.exclude(user=user)
-
-    if not other_users_in_room:
-        {"Message": "No other users in room!"}
-
-    comparison_data = structure_other_users_data(user_stories, other_users_in_room)
-
-    if not comparison_data:
-        {"Message": "No stories read by other users!"}
-
-    return match_algorythim(comparison_data, user_likes)
-
-
-# @shared_task
-def match_maker(user_id):
-    # Get user
-    user = User.objects.get(pk=user_id)
-
-    # Check to see if user is in the matched table
-    if Match.objects.filter(Q(caller=user) | Q(receiver=user)).exists():
-        match = Match.objects.filter(Q(caller=user) | Q(receiver=user)).first()
-        return fetch_detail(serialise_data(match))
+@shared_task(
+    bind=True,
+    acks_late=True,
+    autoretry_for=(TransientProviderError,),
+    retry_backoff=True,
+    retry_backoff_max=300,
+    retry_kwargs={"max_retries": 5},
+)
+def ingest_daily_stories(self, live_on: str | None = None) -> dict:
+    """Create today's stories once. Duplicate deliveries are no-ops."""
+    target = date.fromisoformat(live_on) if live_on else timezone.now().date()
+    existing = Story.objects.filter(live_date=target).count()
+    if existing >= 10:
+        logger.info("stories.ingest.skipped", extra={"live_on": target.isoformat(), "count": existing})
+        return {"created": 0, "skipped": existing, "live_on": target.isoformat()}
 
     try:
-        user_in_room = Room.objects.get(user=user)
-    except ObjectDoesNotExist:
-        return {"Message": "Current user not in room!"}
+        headlines = get_news_provider().fetch_headlines(target)
+    except Exception as exc:
+        raise TransientProviderError(str(exc)) from exc
 
-    user_stories = Story.objects.filter(
-        userreadstory__user=user, live_date=date.today().strftime("%Y-%m-%d")
-    )
-    if not user_stories:
+    created = 0
+    for headline in headlines:
+        _, was_created = Story.objects.get_or_create(
+            title=headline.title,
+            live_date=headline.live_date,
+            defaults={"content": headline.content, "picture_url": headline.picture_url},
+        )
+        created += int(was_created)
+    return {"created": created, "skipped": existing, "live_on": target.isoformat()}
 
-        return {"Message": "There are no user read stories for today! add some?"}
 
-    matched_story, matched_user = find_match(user, user_stories)
+@shared_task(
+    bind=True,
+    acks_late=True,
+    autoretry_for=(TransientProviderError,),
+    retry_backoff=True,
+    retry_kwargs={"max_retries": 3},
+)
+def create_match_for_user(self, user_id: str) -> dict:
+    """Idempotent match creation. A second delivery returns the existing match."""
+    from django.contrib.auth import get_user_model
 
-    if not matched_user or not matched_story:
-        return {"Message": "There are no users to match with at the moment!"}
-
-    match = Match.objects.create(
-        caller_id=matched_user,
-        caller_access_token=generate_token(matched_user),
-        receiver_id=user.id,
-        receiver_access_token=generate_token(str(user.id)),
-        matched_story_id=matched_story,
-    )
-
-    activity = MatchActivity.objects.create(
-        caller_id=matched_user,
-        caller_access_token=generate_token(matched_user),
-        receiver_id=user.id,
-        receiver_access_token=generate_token(str(user.id)),
-        matched_story_id=matched_story,
-    )
-
-    if not Match.objects.filter(id=match.id).exists():
-        return {"Message": "Match not created"}
-
-    if not MatchActivity.objects.filter(id=activity.id).exists():
-
-        return {"Message": "Match Activity not created"}
-
-    data = fetch_detail(serialise_data(match))
-    user_in_room.delete()
-    if not Room.objects.filter(user_id=str(user.id)).exists():
-        Room.objects.filter(user_id=str(user.id)).delete()
-
-    matched_user_in_room = Room.objects.filter(user_id=matched_user)
-    matched_user_in_room.delete()
-    if Room.objects.filter(user_id=matched_user).exists():
-        Room.objects.filter(user_id=matched_user).delete()
-
-    return data
+    User = get_user_model()
+    try:
+        user = User.objects.get(pk=user_id)
+        match = request_match(user)
+    except User.DoesNotExist:
+        return {"status": "missing_user", "user_id": user_id}
+    except MatchServiceError as exc:
+        return {"status": "unmatched", "message": exc.message, "user_id": user_id}
+    return {"status": "matched", "match_id": match.pk, "user_id": user_id}
