@@ -1,54 +1,38 @@
 # History rewrite playbook
 
-Use this only after a recoverable backup exists. The 2019 author names and
-commit dates should be preserved because they are part of the showcase.
+Applied locally on 2026-08-16. Author names and commit dates were preserved.
 
-## 1. Backup
+## Backup
 
 ```bash
-git clone --mirror git@github.com:VaughnDV/retroville-api.git retroville-api-backup.git
-tar -czf retroville-api-backup-$(date +%Y%m%d).tar.gz retroville-api-backup.git
+git bundle create /Users/vaughn/Projects/retroville-api-backup-20260816.bundle --all
 ```
 
-Keep the archive offline until the rewrite has been verified.
-
-## 2. Filter the current clone
-
-Install `git-filter-repo`, then from a fresh clone:
+Restore if needed:
 
 ```bash
-git filter-repo \
+git clone /Users/vaughn/Projects/retroville-api-backup-20260816.bundle restored-retroville-api
+```
+
+## What was rewritten
+
+```bash
+git filter-repo --force \
   --invert-paths \
   --path dump.rdb \
   --path .travis.yml \
-  --replace-text ../replacements.txt
+  --replace-text replacements.txt
 ```
 
-Example `replacements.txt`:
+`replacements.txt` mapped the leaked News API key and mailbox password to
+placeholders. It did not rewrite personal email addresses.
 
-```
-NEWSAPI_KEY_REDACTED==>NEWSAPI_KEY_REDACTED
-REDACTED==>REDACTED
-vaughndevilliers@gmail.com==>owner@example.com
-erimfranci@gmail.com==>collaborator@example.com
-```
-
-Do not use `git rebase -i`. Do not force-push to `master` until the backup is
-verified and the rewritten history has been reviewed.
-
-## 3. Verify
+## Verify
 
 ```bash
 git log --all -- dump.rdb
-git grep -n -I -E 'NEWSAPI_KEY_REDACTED|#!Chai' $(git rev-list --all)
+git log --all -- .travis.yml
 ```
 
-Both commands should return no matches.
-
-## 4. Restore dates
-
-`git-filter-repo` preserves author and committer dates by default. Confirm with:
-
-```bash
-git log --format='%H %ad %s' --date=iso
-```
+Both should be empty. GitHub will keep the old objects until the rewritten
+branches are force-pushed.

@@ -1,44 +1,38 @@
 # Secrets and sensitive-data audit
 
-Scanned: working tree on `modernise/showcase` and every Git revision reachable
-from `master` as of 2026-08-16.
+Scanned after a local `git-filter-repo` rewrite on 2026-08-16.
 
-## Findings removed from the current tree
+## History rewrite (local)
 
-| Finding | Location | Action |
-| --- | --- | --- |
-| Redis dump | `dump.rdb` | Deleted from the working tree and ignored. File is 92 bytes; treated as production-adjacent data. |
-| Travis encrypted Heroku deploy token | `.travis.yml` `env.global.secure` | File removed. Treat the ciphertext as a secret until the underlying Heroku token is rotated/revoked. |
-| Hard-coded News API key | `scripts/fetch_stories_for_today.py` | Key removed. **Rotate the News API key** `NEWSAPI_KEY_REDACTED` if it was ever valid. |
-| Commented Gmail password | `retroville/config/local.py` | Credential removed. **Rotate that mailbox password** if it was ever used. |
-| Personal emails in seed/admin config | dummy-data script, `ADMINS` | Replaced with synthetic `@example.com` addresses. |
-| Heroku app names and deploy flow | `.travis.yml`, README, `docs/index.md` | Obsolete deploy config removed from the current tree. |
+`dump.rdb` and `.travis.yml` were removed from every revision. The News API key
+and mailbox password were replaced with placeholders. Author names and commit
+dates were preserved.
 
-## Postman collection
+A recoverable backup is at:
 
-`retroville.postman_collection.json` used `{{token}}` placeholders and dummy
-`access_token` values (`FRIENDLY`, `DFGDFGDFG`). No live credentials were found.
-Payloads were rewritten to explicit placeholders.
+`/Users/vaughn/Projects/retroville-api-backup-20260816.bundle`
 
-## Still present in Git history
+GitHub still has the pre-rewrite objects until every rewritten branch is
+force-pushed. Do not change repository visibility before that.
 
-History rewrite was **not** applied in this commit. The 2019 author dates are
-part of the portfolio value. A recoverable backup is required before rewriting.
+## Current tree
 
-Known historical remnants:
-
-- `dump.rdb` blob from commit `ebb999f`
-- Travis encrypted deploy value
-- News API key default
-- Commented mailbox password
-- Personal emails in seed scripts
-
-See `docs/security/history-rewrite.md` for the backup-and-filter procedure.
+| Finding | Action |
+| --- | --- |
+| Redis dump | Gone from tree and history |
+| Travis encrypted Heroku token | `.travis.yml` gone from tree and history |
+| News API key | Replaced with `NEWSAPI_KEY_REDACTED` throughout history |
+| Mailbox password | Replaced with `REDACTED` throughout history |
+| Personal emails in old seed scripts | Still present in history (not tokens; not rewritten) |
 
 ## Rotation checklist
 
+History rewrite does not un-leak a credential. Rotate at the provider even
+though the Git objects are now clean locally.
+
 - [ ] Revoke/rotate any Heroku auth token that may have been encrypted for Travis
-- [ ] Rotate the News API key that appeared in `scripts/fetch_stories_for_today.py`
-- [ ] Rotate the mailbox password that appeared in `retroville/config/local.py`
+- [ ] Rotate the News API key that used to be hard-coded in `scripts/fetch_stories_for_today.py`
+- [ ] Rotate the mailbox password that used to appear in `retroville/config/local.py`
 - [ ] Confirm Twilio, AWS and Authy credentials from 2019 are revoked
+- [ ] Force-push rewritten branches only after reviewing this backup
 - [ ] Keep the GitHub repository private until this list is complete
