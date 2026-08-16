@@ -1,8 +1,8 @@
-from .test import *  # noqa: F403
-
 import os
 
 import dj_database_url
+
+from .test import *  # noqa: F403
 
 if os.getenv("DATABASE_URL"):
     DATABASES = {  # noqa: F405

@@ -5,9 +5,9 @@ from __future__ import annotations
 import logging
 from datetime import date
 
-from celery import shared_task
 from django.utils import timezone
 
+from celery import shared_task
 from retroville.matching.services import MatchServiceError, request_match
 from retroville.providers.news import get_news_provider
 from retroville.stories.models import Story

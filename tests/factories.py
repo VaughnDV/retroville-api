@@ -2,7 +2,6 @@ from datetime import date
 
 import factory
 from django.contrib.auth import get_user_model
-
 from retroville.matching.models import Room
 from retroville.stories.models import Story, UserReadStory
 

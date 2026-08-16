@@ -58,7 +58,7 @@ build-backend = "poetry.core.masonry.api"
 target-version = "py312"
 line-length = 110
 src = ["retroville", "tests", "scripts"]
-extend-exclude = ["migrations", "docker/legacy"]
+extend-exclude = ["migrations", "docker/legacy", "retroville/tests", "scripts"]
 
 [tool.ruff.lint]
 select = ["E", "F", "I", "B", "UP", "N"]

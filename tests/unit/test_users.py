@@ -2,8 +2,6 @@ import pytest
 from django.core import mail
 from rest_framework.authtoken.models import Token
 
-from tests.factories import UserFactory
-
 
 @pytest.mark.django_db
 def test_create_user_hashes_password_and_issues_token(api_client):

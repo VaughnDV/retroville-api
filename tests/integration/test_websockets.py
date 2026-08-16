@@ -1,8 +1,8 @@
 import pytest
 from channels.testing import WebsocketCommunicator
 from rest_framework.authtoken.models import Token
-
 from retroville.asgi import application
+
 from tests.factories import UserFactory
 
 

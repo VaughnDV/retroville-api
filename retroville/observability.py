@@ -13,9 +13,7 @@ from django.utils.deprecation import MiddlewareMixin
 
 correlation_id_var: ContextVar[str] = ContextVar("correlation_id", default="-")
 
-_SECRET_KEYS = re.compile(
-    r"(password|secret|token|authorization|api[_-]?key|account_sid)", re.I
-)
+_SECRET_KEYS = re.compile(r"(password|secret|token|authorization|api[_-]?key|account_sid)", re.I)
 _REDACTED = "***REDACTED***"
 
 
@@ -51,8 +49,7 @@ class RedactingJsonFormatter(logging.Formatter):
 def _redact(value: object) -> object:
     if isinstance(value, dict):
         return {
-            key: _REDACTED if _SECRET_KEYS.search(str(key)) else _redact(item)
-            for key, item in value.items()
+            key: _REDACTED if _SECRET_KEYS.search(str(key)) else _redact(item) for key, item in value.items()
         }
     if isinstance(value, list):
         return [_redact(item) for item in value]

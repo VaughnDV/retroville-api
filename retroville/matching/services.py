@@ -54,9 +54,7 @@ def request_match(user, *, today: date | None = None, rng=None) -> Match:
         if not Room.objects.select_for_update().filter(user=user).exists():
             raise MatchServiceError("Current user not in room!")
 
-        user_stories = list(
-            Story.objects.filter(userreadstory__user=user, live_date=today).distinct()
-        )
+        user_stories = list(Story.objects.filter(userreadstory__user=user, live_date=today).distinct())
         if not user_stories:
             raise MatchServiceError("There are no user read stories for today! add some?")
 
@@ -87,7 +85,9 @@ def request_match(user, *, today: date | None = None, rng=None) -> Match:
                 ]
             )
             if likes:
-                candidates.append(Candidate(str(room.user_id), frozenset(int(i) for i in likes if i is not None)))
+                candidates.append(
+                    Candidate(str(room.user_id), frozenset(int(i) for i in likes if i is not None))
+                )
 
         story_id, matched_user_id = select_match(user_likes, candidates, rng=rng)
         if not matched_user_id or not story_id:

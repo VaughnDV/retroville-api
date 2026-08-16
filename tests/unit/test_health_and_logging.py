@@ -3,7 +3,6 @@ import logging
 
 import pytest
 from django.test import RequestFactory
-
 from retroville.health.views import liveness, readiness
 from retroville.observability import RedactingJsonFormatter, RequestContextMiddleware
 

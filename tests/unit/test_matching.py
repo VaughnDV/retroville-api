@@ -1,11 +1,10 @@
 from datetime import date
-from unittest.mock import patch
 
 import pytest
 from rest_framework.authtoken.models import Token
-
 from retroville.matching.models import Match, Room
 from retroville.matching.services import MatchServiceError, request_match
+
 from tests.factories import StoryFactory, UserFactory, UserReadStoryFactory, WaitingRoomFactory
 
 

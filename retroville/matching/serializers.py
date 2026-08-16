@@ -1,8 +1,8 @@
 from rest_framework import serializers
 
 from retroville.matching.models import Match, Room, RoomActivity
-from retroville.users.serializers import UserSerializer
 from retroville.stories.serializers import StorySerializer
+from retroville.users.serializers import UserSerializer
 
 
 class RoomSerializer(serializers.ModelSerializer):

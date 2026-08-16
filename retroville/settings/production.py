@@ -15,9 +15,7 @@ required = [
 ]
 missing = [name for name in required if not os.getenv(name)]
 if missing:
-    raise ImproperlyConfigured(
-        "Production settings refuse to start without: " + ", ".join(missing)
-    )
+    raise ImproperlyConfigured("Production settings refuse to start without: " + ", ".join(missing))
 
 DEBUG = False
 SECRET_KEY = os.environ["DJANGO_SECRET_KEY"]

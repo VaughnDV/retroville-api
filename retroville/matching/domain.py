@@ -8,8 +8,8 @@ deterministic in tests.
 from __future__ import annotations
 
 import random
+from collections.abc import Iterable, Mapping, Sequence
 from dataclasses import dataclass
-from typing import Iterable, Mapping, Sequence
 
 
 @dataclass(frozen=True)
@@ -22,8 +22,9 @@ def liked_story_ids(stories: Iterable[Mapping[str, object]]) -> list[int]:
     """Return story ids marked interested, preserving 2019 iteration order."""
     likes: list[int] = []
     for story in stories:
-        if story.get("interested"):
-            likes.append(int(story["id"]))
+        story_id = story.get("id")
+        if story.get("interested") and story_id is not None:
+            likes.append(int(str(story_id)))
     return likes
 
 

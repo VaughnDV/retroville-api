@@ -129,3 +129,4 @@ dump.rdb
 .coverage
 coverage.xml
 htmlcov/
+.cache/

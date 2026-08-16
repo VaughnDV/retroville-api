@@ -1,6 +1,6 @@
+from django.conf import settings
 from django.db import models
 from django.utils import timezone
-from django.conf import settings
 
 
 class Story(models.Model):
@@ -37,9 +37,7 @@ class UserReadStory(models.Model):
     modified_at = models.DateTimeField()
 
     class Meta:
-        constraints = [
-            models.UniqueConstraint(fields=["user", "story"], name="unique_user_read_story")
-        ]
+        constraints = [models.UniqueConstraint(fields=["user", "story"], name="unique_user_read_story")]
 
     def save(self, *args, **kwargs):
         now = timezone.now()

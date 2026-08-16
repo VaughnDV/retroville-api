@@ -1,5 +1,6 @@
-import factory
 from datetime import datetime
+
+import factory
 
 
 class StoryFactory(factory.django.DjangoModelFactory):
@@ -11,6 +12,4 @@ class StoryFactory(factory.django.DjangoModelFactory):
     title = factory.Sequence(lambda n: f"Test Title {n}")
     content = factory.Sequence(lambda n: f"Test Content {n}")
     picture_url = factory.Sequence(lambda n: f"Fake picture url {n}")
-    live_date = factory.Sequence(
-        f"{datetime.now().year}-{datetime.now().month}-{datetime.now().day}"
-    )
+    live_date = factory.Sequence(f"{datetime.now().year}-{datetime.now().month}-{datetime.now().day}")

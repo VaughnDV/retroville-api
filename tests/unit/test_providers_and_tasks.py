@@ -1,13 +1,11 @@
 from datetime import date
 
 import pytest
-
+from retroville.matching.tasks import TransientProviderError, create_match_for_user, ingest_daily_stories
 from retroville.providers.news import FakeNewsProvider
 from retroville.providers.sms import FakeSmsProvider
 from retroville.providers.voice import FakeVoiceProvider
-from retroville.matching.tasks import TransientProviderError, create_match_for_user, ingest_daily_stories
 from retroville.stories.models import Story
-from tests.factories import UserFactory
 
 
 def test_fake_sms_accepts_demo_code():
@@ -42,7 +40,8 @@ def test_ingest_retries_on_provider_failure(monkeypatch):
     def boom(_live_on):
         raise RuntimeError("news down")
 
-    monkeypatch.setattr("retroville.matching.tasks.get_news_provider", lambda: type("P", (), {"fetch_headlines": boom})())
+    provider = type("P", (), {"fetch_headlines": boom})()
+    monkeypatch.setattr("retroville.matching.tasks.get_news_provider", lambda: provider)
     with pytest.raises(TransientProviderError):
         ingest_daily_stories.run(live_on="2019-09-02")
 
