@@ -13,7 +13,7 @@ COPY pyproject.toml poetry.lock ./
 RUN poetry install --only main --no-root
 
 COPY retroville ./retroville
-COPY manage.py ./
+COPY manage.py README.md ./
 RUN poetry install --only main
 
 

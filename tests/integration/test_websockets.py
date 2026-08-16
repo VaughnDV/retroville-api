@@ -1,9 +1,18 @@
 import pytest
+from asgiref.sync import sync_to_async
 from channels.testing import WebsocketCommunicator
 from rest_framework.authtoken.models import Token
 from retroville.asgi import application
 
 from tests.factories import UserFactory
+
+
+async def _token_for_new_user() -> str:
+    def _create() -> str:
+        user = UserFactory()
+        return Token.objects.get(user=user).key
+
+    return await sync_to_async(_create)()
 
 
 @pytest.mark.integration
@@ -20,9 +29,8 @@ async def test_websocket_rejects_anonymous():
 @pytest.mark.django_db(transaction=True)
 @pytest.mark.asyncio
 async def test_websocket_auth_message_and_disconnect():
-    user = UserFactory()
-    token = Token.objects.get(user=user)
-    communicator = WebsocketCommunicator(application, f"/ws/chat/lobby/?token={token.key}")
+    token = await _token_for_new_user()
+    communicator = WebsocketCommunicator(application, f"/ws/chat/lobby/?token={token}")
     connected, _code = await communicator.connect()
     assert connected
     await communicator.send_json_to({"message": "hello"})
@@ -35,9 +43,8 @@ async def test_websocket_auth_message_and_disconnect():
 @pytest.mark.django_db(transaction=True)
 @pytest.mark.asyncio
 async def test_websocket_oversized_payload_closes():
-    user = UserFactory()
-    token = Token.objects.get(user=user)
-    communicator = WebsocketCommunicator(application, f"/ws/chat/lobby/?token={token.key}")
+    token = await _token_for_new_user()
+    communicator = WebsocketCommunicator(application, f"/ws/chat/lobby/?token={token}")
     connected, _code = await communicator.connect()
     assert connected
     await communicator.send_to(text_data='{"message":"' + ("x" * 5000) + '"}')
