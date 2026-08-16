@@ -32,9 +32,7 @@ async def test_websocket_rejects_anonymous():
 @pytest.mark.asyncio
 async def test_websocket_auth_message_and_disconnect():
     token = await _token_for_new_user()
-    communicator = WebsocketCommunicator(
-        application, f"/ws/chat/lobby/?token={token}", headers=WS_HEADERS
-    )
+    communicator = WebsocketCommunicator(application, f"/ws/chat/lobby/?token={token}", headers=WS_HEADERS)
     connected, _code = await communicator.connect()
     assert connected
     await communicator.send_json_to({"message": "hello"})
@@ -48,9 +46,7 @@ async def test_websocket_auth_message_and_disconnect():
 @pytest.mark.asyncio
 async def test_websocket_oversized_payload_closes():
     token = await _token_for_new_user()
-    communicator = WebsocketCommunicator(
-        application, f"/ws/chat/lobby/?token={token}", headers=WS_HEADERS
-    )
+    communicator = WebsocketCommunicator(application, f"/ws/chat/lobby/?token={token}", headers=WS_HEADERS)
     connected, _code = await communicator.connect()
     assert connected
     await communicator.send_to(text_data='{"message":"' + ("x" * 5000) + '"}')
