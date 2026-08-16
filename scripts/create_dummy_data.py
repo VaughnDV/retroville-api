@@ -25,11 +25,11 @@ def main():
 
     try:
         vaughn = User.objects.create_superuser(
-            email="vaughndevilliers@gmail.com",
+            email="owner@example.com",
             password="password123"
         )
         erim = User.objects.create_superuser(
-            email="erimfranci@gmail.com",
+            email="collaborator@example.com",
             password="password123"
         )
         users.append(vaughn)

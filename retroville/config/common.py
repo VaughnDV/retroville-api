@@ -52,7 +52,7 @@ class Common(Configuration):
     # Email
     EMAIL_BACKEND = "django.core.mail.backends.smtp.EmailBackend"
 
-    ADMINS = (("Author", "vaughndevilliers@gmail.com"),)
+    ADMINS = (("Author", "owner@example.com"),)
 
     # Postgres
     DATABASES = {

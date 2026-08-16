@@ -112,3 +112,20 @@ venv.bak/
 
 # mypy
 .mypy_cache/
+
+# Local handover and scratch work
+/tmp/
+
+# Data dumps and local secrets
+dump.rdb
+*.rdb
+.env
+.env.*
+!.env.example
+
+# Coverage and tooling
+.ruff_cache/
+.mypy_cache/
+.coverage
+coverage.xml
+htmlcov/
