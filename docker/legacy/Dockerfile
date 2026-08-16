@@ -9,7 +9,7 @@ ENV PYTHONUNBUFFERED=1 \
 
 WORKDIR /code
 
-COPY requirements.txt /tmp/requirements.txt
+COPY docker/legacy/requirements.txt /tmp/requirements.txt
 RUN apt-get update \
     && apt-get install -y --no-install-recommends gcc libpq-dev \
     && pip install --no-cache-dir 'pip<21' 'setuptools<50' \

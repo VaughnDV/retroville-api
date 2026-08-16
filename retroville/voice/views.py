@@ -1,68 +1,29 @@
-import os
-from twilio.rest import Client
-from twilio.twiml.voice_response import VoiceResponse
-from django.views.decorators.http import require_http_methods
 from django.http import HttpResponse, JsonResponse
 from django.views.decorators.csrf import csrf_exempt
-from authy.api import AuthyApiClient
-from django.db.models import Q
-from django.contrib.auth import get_user_model
+from django.views.decorators.http import require_http_methods
+from twilio.twiml.voice_response import VoiceResponse
 
-
-User = get_user_model()
-
-
-AUTHY_API_KEY = os.environ.get("AUTHY_API_KEY")
-ACCOUNT_SID = os.getenv("ACCOUNT_SID")
-API_KEY = os.getenv("API_KEY")
-API_KEY_SECRET = os.getenv("API_KEY_SECRET")
-PUSH_CREDENTIAL_SID = os.getenv("PUSH_CREDENTIAL_SID")
-APP_SID = os.getenv("APP_SID")
-
-api = AuthyApiClient(AUTHY_API_KEY)
+from retroville.providers.sms import get_sms_provider
+from retroville.users.models import User
 
 
 @csrf_exempt
 @require_http_methods(["GET", "POST"])
 def place_call(request):
-    """
-    Makes a call to the specified client using the Twilio REST API.
-    """
-    client = Client(API_KEY, API_KEY_SECRET, ACCOUNT_SID)
-    if request.method == "GET":
-        to = request.GET["to"]
-        caller = request.GET["From"]
-    else:
-        to = request.POST["to"]
-        caller = request.GET["From"]
-
-    call = client.calls.create(
-        url=request.url_root + "incoming", to="client:" + to, from_=caller
-    )
-
-    return HttpResponse(str(call))
+    return HttpResponse("Voice calling is disabled in the offline demo.", status=501)
 
 
 @csrf_exempt
 @require_http_methods(["GET", "POST"])
 def make_call(request):
-    """
-    Creates an endpoint that can be used in your TwiML App as the Voice Request Url.
-    In order to make an outgoing call using Twilio Voice SDK, you need to provide a
-    TwiML App SID in the Access Token. You can run your server, make it publicly
-    accessible and use `/makeCall` endpoint as the Voice Request Url in your TwiML App.
-    """
+    to = request.POST.get("to") or request.GET.get("to")
+    caller = request.POST.get("From") or request.GET.get("From")
     resp = VoiceResponse()
-    if request.method == "POST":
-        to = request.POST.get("to")
-        caller = request.POST.get("From")
+    if to and caller:
+        resp.dial(callerId=caller, answer_on_bridge=True).client(to)
     else:
-        to = request.GET.get("to")
-        caller = request.GET.get("From")
-
-    resp.dial(callerId=caller, answer_on_bridge=True).client(to)
-
-    return HttpResponse(str(resp))
+        resp.say("Missing call parameters")
+    return HttpResponse(str(resp), content_type="text/xml")
 
 
 @csrf_exempt
@@ -70,58 +31,38 @@ def make_call(request):
 def ping(request):
     resp = VoiceResponse()
     resp.say("Pong!!")
-    return HttpResponse(str(resp))
+    return HttpResponse(str(resp), content_type="text/xml")
 
 
 @csrf_exempt
 @require_http_methods(["GET", "POST"])
 def incoming(request):
-    """
-    Creates an endpoint that plays back a greeting.
-    """
     resp = VoiceResponse()
     resp.say("Congratulations! You have received your first inbound call! Good bye.")
-    return HttpResponse(str(resp))
+    return HttpResponse(str(resp), content_type="text/xml")
 
 
 @csrf_exempt
 @require_http_methods(["POST"])
 def send_sms(request):
-    country_code = request.GET.get("country_code")
-    phone_number = request.GET.get("phone_number")
-
-    if not User.objects.filter(
-        Q(country_code=country_code) and Q(phone_number=phone_number)
-    ):
-
-        r = api.phones.verification_start(
-            phone_number=phone_number, country_code=country_code, via="sms"
+    country_code = request.GET.get("country_code") or request.POST.get("country_code")
+    phone_number = request.GET.get("phone_number") or request.POST.get("phone_number")
+    if User.objects.filter(country_code=country_code, phone_number=phone_number).exists():
+        return JsonResponse(
+            {
+                "success": True,
+                "message": "There is an account already associated with this number, please log in.",
+            }
         )
-
-        if r.ok():
-            return JsonResponse(data={"success": True, "message": r.content["message"]})
-        else:
-            return JsonResponse(
-                data={"success": False, "message": r.errors()["message"]}
-            )
-    return JsonResponse(
-        data={
-            "success": True,
-            "message": "There is an account already associated with this number, please log in.",
-        }
-    )
+    result = get_sms_provider().start_verification(phone_number or "", country_code or "")
+    return JsonResponse({"success": result.ok, "message": result.message})
 
 
 @csrf_exempt
 @require_http_methods(["POST"])
 def validate_sms(request):
-    country_code = request.GET.get("country_code")
-    phone_number = request.GET.get("phone_number")
-    code = request.GET.get("verification_code")
-
-    r = api.phones.verification_check(phone_number, country_code, code)
-
-    if r.ok():
-        return JsonResponse(data={"success": True, "message": r.content["message"]})
-    else:
-        return JsonResponse(data={"success": False, "message": r.errors()["message"]})
+    country_code = request.GET.get("country_code") or request.POST.get("country_code")
+    phone_number = request.GET.get("phone_number") or request.POST.get("phone_number")
+    code = request.GET.get("verification_code") or request.POST.get("verification_code")
+    result = get_sms_provider().check_verification(phone_number or "", country_code or "", code or "")
+    return JsonResponse({"success": result.ok, "message": result.message})

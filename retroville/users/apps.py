@@ -1,7 +1,7 @@
 from django.apps import AppConfig
 
 
-class MatchingConfig(AppConfig):
+class UsersConfig(AppConfig):
     default_auto_field = "django.db.models.AutoField"
-    name = "retroville.matching"
-    label = "matching"
+    name = "retroville.users"
+    label = "users"
