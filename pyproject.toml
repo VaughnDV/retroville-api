@@ -11,7 +11,7 @@ packages = [{ include = "retroville" }]
 python = ">=3.12,<3.14"
 django = "~5.2.0"
 djangorestframework = "^3.16.0"
-django-filter = "^25.1"
+django-filter = ">=25.1,<27.0"
 django-model-utils = "^5.0.0"
 django-phonenumber-field = { version = "^8.1.0", extras = ["phonenumberslite"] }
 django-rest-passwordreset = "^1.5.0"
