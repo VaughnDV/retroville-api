@@ -1,0 +1,26 @@
+# Disposable 2019 runtime for characterisation only.
+# Do not use for development or deployment.
+
+services:
+  legacy-postgres:
+    image: postgres:9.6
+    environment:
+      POSTGRES_HOST_AUTH_METHOD: trust
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+  legacy-tests:
+    build:
+      context: .
+      dockerfile: docker/legacy/Dockerfile
+    environment:
+      DATABASE_URL: postgres://postgres:@legacy-postgres:5432/postgres
+      DJANGO_SECRET_KEY: legacy-characterisation
+      DJANGO_CONFIGURATION: Local
+      DJANGO_SETTINGS_MODULE: retroville.config
+    depends_on:
+      legacy-postgres:
+        condition: service_healthy

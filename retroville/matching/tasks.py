@@ -1,11 +1,11 @@
 from __future__ import absolute_import, unicode_literals
 
 # from celery import shared_task
-import random
 
 from django.contrib.auth import get_user_model
 from django.db.models import Q
 from .models import Match, MatchActivity, Room
+from .domain import Candidate, liked_story_ids, select_match as domain_select_match
 from retroville.stories.models import UserReadStory, Story
 from retroville.voice.tasks import generate_token
 from django.core.serializers import serialize
@@ -99,33 +99,14 @@ def structure_user_likes(user_data):
 
 
 def match_algorythim(comparison_data, user_likes):
-    coeff = 0
-    matched_user = None
-    matched_story = None
-
-    for i in range(len(comparison_data)):
-
-        temp_likes = list()
-        for j in range(len(comparison_data[i]["user"]["stories"])):
-            if comparison_data[i]["user"]["stories"][j]["interested"]:
-                temp_likes.append(comparison_data[i]["user"]["stories"][j]["id"])
-            else:
-                continue
-
-        intersection = list(set(temp_likes) & set(user_likes))
-        union = list(set(temp_likes + user_likes))
-
-        coeff_new = len(intersection) / len(union)
-        if coeff_new > coeff:
-            matched_user = comparison_data[i]["user"]["detail"]["id"]
-            matched_story = random.sample(intersection, 1)
-            coeff = coeff_new
-            user_no = i
-
-    return (
-        matched_story[0] if matched_story else None,
-        matched_user if matched_story else None,
-    )
+    candidates = [
+        Candidate(
+            user_id=item["user"]["detail"]["id"],
+            liked_story_ids=frozenset(liked_story_ids(item["user"]["stories"])),
+        )
+        for item in comparison_data
+    ]
+    return domain_select_match(user_likes, candidates)
 
 
 def find_match(user, user_stories):
