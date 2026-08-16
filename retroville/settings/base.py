@@ -45,7 +45,7 @@ INSTALLED_APPS = [
     "django_rest_passwordreset",
     "drf_spectacular",
     "channels",
-    "retroville.users",
+    "retroville.users.apps.UsersConfig",
     "retroville.stories",
     "retroville.voice",
     "retroville.matching",
@@ -194,6 +194,7 @@ TWILIO_VERIFY_SERVICE_SID = os.getenv("TWILIO_VERIFY_SERVICE_SID", "")
 NEWS_API_KEY = os.getenv("NEWS_API_KEY", "")
 NEWS_COUNTRY = os.getenv("COUNTRY", "gb")
 NEWS_LANGUAGE = os.getenv("LANGUAGE", "en")
+PROVIDERS_USE_FAKES = env_bool("PROVIDERS_USE_FAKES", "false")
 
 WEBSOCKET_ALLOWED_ORIGINS = env_list("WEBSOCKET_ALLOWED_ORIGINS", "http://localhost:8000")
 WEBSOCKET_MAX_MESSAGE_BYTES = int(os.getenv("WEBSOCKET_MAX_MESSAGE_BYTES", "4096"))

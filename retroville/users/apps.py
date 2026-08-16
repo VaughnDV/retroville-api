@@ -5,3 +5,6 @@ class UsersConfig(AppConfig):
     default_auto_field = "django.db.models.AutoField"
     name = "retroville.users"
     label = "users"
+
+    def ready(self) -> None:
+        from retroville.users import tasks as _tasks  # noqa: F401

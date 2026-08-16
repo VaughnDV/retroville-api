@@ -2,6 +2,7 @@ from .base import *  # noqa: F403
 
 SECRET_KEY = "test-secret-key-not-for-production"
 DEBUG = False
+PROVIDERS_USE_FAKES = True
 ALLOWED_HOSTS = ["testserver", "localhost", "127.0.0.1"]
 DATABASES = {  # noqa: F405
     "default": {
@@ -16,6 +17,7 @@ CELERY_TASK_ALWAYS_EAGER = True
 CELERY_TASK_EAGER_PROPAGATES = True
 EMAIL_BACKEND = "django.core.mail.backends.locmem.EmailBackend"
 PASSWORD_HASHERS = ["django.contrib.auth.hashers.MD5PasswordHasher"]
+MIDDLEWARE = [item for item in MIDDLEWARE if "whitenoise" not in item]  # noqa: F405
 STORAGES["staticfiles"] = {  # noqa: F405
     "BACKEND": "django.contrib.staticfiles.storage.StaticFilesStorage"
 }

@@ -61,10 +61,10 @@ class TwilioVerifyProvider:
 def get_sms_provider() -> SmsProvider:
     from django.conf import settings
 
-    if getattr(settings, "TWILIO_VERIFY_SERVICE_SID", "") and not settings.DEBUG:
-        return TwilioVerifyProvider(
-            settings.TWILIO_ACCOUNT_SID,
-            settings.TWILIO_API_KEY_SECRET,
-            settings.TWILIO_VERIFY_SERVICE_SID,
-        )
-    return FakeSmsProvider()
+    if getattr(settings, "PROVIDERS_USE_FAKES", True) or not settings.TWILIO_VERIFY_SERVICE_SID:
+        return FakeSmsProvider()
+    return TwilioVerifyProvider(
+        settings.TWILIO_ACCOUNT_SID,
+        settings.TWILIO_API_KEY_SECRET,
+        settings.TWILIO_VERIFY_SERVICE_SID,
+    )

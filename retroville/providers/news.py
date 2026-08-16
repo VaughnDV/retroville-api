@@ -79,6 +79,6 @@ class NewsApiProvider:
 def get_news_provider() -> NewsProvider:
     from django.conf import settings
 
-    if settings.NEWS_API_KEY:
-        return NewsApiProvider(settings.NEWS_API_KEY, settings.NEWS_COUNTRY, settings.NEWS_LANGUAGE)
-    return FakeNewsProvider()
+    if getattr(settings, "PROVIDERS_USE_FAKES", True) or not settings.NEWS_API_KEY:
+        return FakeNewsProvider()
+    return NewsApiProvider(settings.NEWS_API_KEY, settings.NEWS_COUNTRY, settings.NEWS_LANGUAGE)

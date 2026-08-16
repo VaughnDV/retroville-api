@@ -71,6 +71,8 @@ ignore = ["N806"]
 [tool.pytest.ini_options]
 DJANGO_SETTINGS_MODULE = "retroville.settings.test"
 python_files = ["test_*.py"]
+testpaths = ["tests"]
+asyncio_mode = "auto"
 addopts = "-q --strict-markers --reuse-db"
 markers = [
     "integration: tests that need PostgreSQL, Redis or Channels",
@@ -83,12 +85,17 @@ filterwarnings = [
 branch = true
 source = ["retroville"]
 omit = [
-    "*/migrations/*",
-    "*/tests/*",
-    "*/admin.py",
+    "**/migrations/*",
+    "**/admin.py",
     "manage.py",
     "retroville/wsgi.py",
     "retroville/asgi.py",
+    "retroville/runner.py",
+    "retroville/settings/local.py",
+    "retroville/settings/production.py",
+    "retroville/settings/integration.py",
+    "retroville/stories/test/*",
+    "retroville/chat/views.py",
 ]
 
 [tool.coverage.report]

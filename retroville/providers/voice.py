@@ -36,6 +36,8 @@ class TwilioVoiceProvider:
 
 
 def get_voice_provider() -> VoiceProvider:
-    if settings.TWILIO_ACCOUNT_SID.startswith("AC") and settings.TWILIO_ACCOUNT_SID != "ACtest":
-        return TwilioVoiceProvider()
-    return FakeVoiceProvider()
+    from django.conf import settings
+
+    if getattr(settings, "PROVIDERS_USE_FAKES", True):
+        return FakeVoiceProvider()
+    return TwilioVoiceProvider()
