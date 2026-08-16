@@ -1,12 +1,22 @@
-site_name: retroville
-site_description: Connecting people with similar interests
+site_name: Retroville API
+site_description: Spontaneous activity matching and real-time communication
 repo_url: https://github.com/VaughnDV/retroville-api
 site_dir: site
-copyright: Copyright &copy; 2019, <a href="https://github.com/VaughnDV">VaughnDV</a>.
-dev_addr: 0.0.0.0:8001
+copyright: Copyright &copy; 2019–2026 Vaughn de Villiers
 
 nav:
-  - Home: 'index.md'
+  - Home: index.md
+  - Architecture: architecture.md
+  - Legacy baseline: legacy-baseline.md
+  - Migration path: migration-path.md
+  - Retry semantics: retry-semantics.md
   - API:
-    - Authentication: 'api/authentication.md'
-    - Users: 'api/users.md'
+      - Authentication: api/authentication.md
+      - Users: api/users.md
+  - Decisions:
+      - Django 5.2 LTS: decisions/0001-django-52-lts.md
+      - Fakes and fail-closed: decisions/0002-fakes-and-fail-closed.md
+      - Characterisation first: decisions/0003-characterisation-first.md
+
+theme:
+  name: material

@@ -1,12 +1,12 @@
 import uuid
-from django.db import models
+
 from django.conf import settings
-from django.dispatch import receiver
 from django.contrib.auth.models import AbstractUser, BaseUserManager
-from django.utils.encoding import python_2_unicode_compatible
+from django.db import models
 from django.db.models.signals import post_save
+from django.dispatch import receiver
+from django.utils.translation import gettext_lazy as _
 from rest_framework.authtoken.models import Token
-from django.utils.translation import ugettext_lazy as _
 
 
 class UserManager(BaseUserManager):
@@ -15,7 +15,6 @@ class UserManager(BaseUserManager):
     use_in_migrations = True
 
     def _create_user(self, email, password, **extra_fields):
-        """Create and save a User with the given email and password."""
         if not email:
             raise ValueError("The given email must be set")
         email = self.normalize_email(email)
@@ -25,13 +24,11 @@ class UserManager(BaseUserManager):
         return user
 
     def create_user(self, email, password=None, **extra_fields):
-        """Create and save a regular User with the given email and password."""
         extra_fields.setdefault("is_staff", False)
         extra_fields.setdefault("is_superuser", False)
         return self._create_user(email, password, **extra_fields)
 
     def create_superuser(self, email, password, **extra_fields):
-        """Create and save a SuperUser with the given email and password."""
         extra_fields.setdefault("is_staff", True)
         extra_fields.setdefault("is_superuser", True)
 
@@ -43,21 +40,20 @@ class UserManager(BaseUserManager):
         return self._create_user(email, password, **extra_fields)
 
 
-@python_2_unicode_compatible
 class User(AbstractUser):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     username = None
     email = models.EmailField(_("email address"), unique=True)
-    date_of_birth = models.DateField(null=True)
-    country_code = models.CharField(max_length=512)
-    phone_number = models.CharField(max_length=512)
+    date_of_birth = models.DateField(null=True, blank=True)
+    country_code = models.CharField(max_length=512, blank=True, default="")
+    phone_number = models.CharField(max_length=512, blank=True, default="")
 
     USERNAME_FIELD = "email"
     REQUIRED_FIELDS = []
 
     objects = UserManager()
 
-    def __str__(self):
+    def __str__(self) -> str:
         return str(self.id)
 
 

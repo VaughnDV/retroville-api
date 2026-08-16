@@ -1,14 +1,12 @@
+from django.conf import settings
 from django.db import models
 from django.utils import timezone
-from django.conf import settings
+
 from retroville.stories.models import Story
 
 
 class Room(models.Model):
-
-    user = models.OneToOneField(
-        settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name="+"
-    )
+    user = models.OneToOneField(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name="+")
     created_at = models.DateTimeField(editable=False)
     modified_at = models.DateTimeField()
 
@@ -17,7 +15,7 @@ class Room(models.Model):
         if not self.id:
             self.created_at = timezone.now()
         self.modified_at = timezone.now()
-        return super(Room, self).save(*args, **kwargs)
+        return super().save(*args, **kwargs)
 
     def __str__(self):
         return f"{self.id} {self.user}"
@@ -27,14 +25,9 @@ class Room(models.Model):
 
 
 class Match(models.Model):
-
-    caller = models.OneToOneField(
-        settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name="+"
-    )
+    caller = models.OneToOneField(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name="+")
     caller_access_token = models.CharField(max_length=1024)
-    receiver = models.OneToOneField(
-        settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name="+"
-    )
+    receiver = models.OneToOneField(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name="+")
     receiver_access_token = models.CharField(max_length=1024)
     matched_story = models.ForeignKey(Story, on_delete=models.CASCADE)
     created_at = models.DateTimeField(editable=False)
@@ -45,7 +38,7 @@ class Match(models.Model):
         if not self.id:
             self.created_at = timezone.now()
         self.modified_at = timezone.now()
-        return super(Match, self).save(*args, **kwargs)
+        return super().save(*args, **kwargs)
 
     def __str__(self):
         return f"Caller: {self.receiver}, Receiver: {self.caller}"
@@ -55,7 +48,6 @@ class Match(models.Model):
 
 
 class RoomActivity(models.Model):
-
     user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
     created_at = models.DateTimeField(editable=False)
     modified_at = models.DateTimeField()
@@ -65,21 +57,16 @@ class RoomActivity(models.Model):
         if not self.id:
             self.created_at = timezone.now()
         self.modified_at = timezone.now()
-        return super(RoomActivity, self).save(*args, **kwargs)
+        return super().save(*args, **kwargs)
 
     class Meta:
         verbose_name_plural = "room_activity"
 
 
 class MatchActivity(models.Model):
-
-    caller = models.ForeignKey(
-        settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name="+"
-    )
+    caller = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name="+")
     caller_access_token = models.CharField(max_length=1024)
-    receiver = models.ForeignKey(
-        settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name="+"
-    )
+    receiver = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name="+")
     receiver_access_token = models.CharField(max_length=1024)
     matched_story = models.ForeignKey(Story, on_delete=models.CASCADE)
     created_at = models.DateTimeField(editable=False)
@@ -90,7 +77,7 @@ class MatchActivity(models.Model):
         if not self.id:
             self.created_at = timezone.now()
         self.modified_at = timezone.now()
-        return super(MatchActivity, self).save(*args, **kwargs)
+        return super().save(*args, **kwargs)
 
     def __str__(self):
         return f"Caller: {self.receiver.id}, Receiver: {self.caller.id}"

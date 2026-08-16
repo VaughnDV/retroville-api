@@ -59,7 +59,9 @@ if __name__ == '__main__':
     os.environ.setdefault("DJANGO_SETTINGS_MODULE", "retroville.config")
     COUNTRY = os.environ.get("COUNTRY", "gb")
     LANGUAGE = os.environ.get("LANGUAGE", "en")
-    NEWS_API_KEY = os.environ.get("NEWS_API_KETY", "NEWSAPI_KEY_REDACTED")
+    NEWS_API_KEY = os.environ.get("NEWS_API_KEY")
+    if not NEWS_API_KEY:
+        raise RuntimeError("NEWS_API_KEY is required to fetch live headlines")
     import configurations
     configurations.setup()
     from retroville.stories.models import Story

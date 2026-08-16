@@ -1,0 +1,115 @@
+[tool.poetry]
+name = "retroville-api"
+version = "2.0.0"
+description = "Django API for spontaneous activity matching and real-time communication"
+authors = ["Vaughn de Villiers <owner@example.com>"]
+license = "MIT"
+readme = "README.md"
+packages = [{ include = "retroville" }]
+
+[tool.poetry.dependencies]
+python = ">=3.12,<3.14"
+django = "~5.2.0"
+djangorestframework = "^3.16.0"
+django-filter = "^25.1"
+django-model-utils = "^5.0.0"
+django-phonenumber-field = { version = "^8.1.0", extras = ["phonenumberslite"] }
+django-rest-passwordreset = "^1.5.0"
+django-storages = { version = "^1.14.4", extras = ["s3"] }
+dj-database-url = "^3.0.0"
+psycopg = { version = "^3.2.0", extras = ["binary"] }
+celery = { version = "^5.5.0", extras = ["redis"] }
+redis = "^6.0.0"
+channels = { version = "^4.2.0", extras = ["daphne"] }
+channels-redis = "^4.2.0"
+gunicorn = "^23.0.0"
+twilio = "^9.6.0"
+boto3 = "^1.38.0"
+python-dotenv = "^1.1.0"
+structlog = "^25.4.0"
+drf-spectacular = "^0.28.0"
+whitenoise = "^6.9.0"
+django-redis = "^5.4.0"
+asgiref = "^3.8.0"
+
+[tool.poetry.group.dev.dependencies]
+pytest = "^9.0.3"
+pytest-django = "^4.11.0"
+pytest-asyncio = "^1.0.0"
+pytest-cov = "^6.2.0"
+factory-boy = "^3.3.0"
+ruff = "^0.12.0"
+mypy = "^1.16.0"
+django-stubs = { version = "^5.2.0", extras = ["compatible-mypy"] }
+djangorestframework-stubs = "^3.15.0"
+pre-commit = "^4.2.0"
+pip-audit = "^2.9.0"
+types-requests = "^2.32.0"
+
+[tool.poetry.group.docs.dependencies]
+mkdocs = "^1.6.0"
+mkdocs-material = "^9.6.0"
+
+[build-system]
+requires = ["poetry-core>=2.0.0"]
+build-backend = "poetry.core.masonry.api"
+
+[tool.ruff]
+target-version = "py312"
+line-length = 110
+src = ["retroville", "tests", "scripts"]
+extend-exclude = ["migrations", "docker/legacy", "retroville/tests", "scripts"]
+
+[tool.ruff.lint]
+select = ["E", "F", "I", "B", "UP", "N"]
+ignore = ["N806"]
+
+[tool.ruff.lint.per-file-ignores]
+"tests/**" = ["N802"]
+"scripts/**" = ["N802"]
+
+[tool.pytest.ini_options]
+DJANGO_SETTINGS_MODULE = "retroville.settings.test"
+python_files = ["test_*.py"]
+testpaths = ["tests"]
+asyncio_mode = "auto"
+addopts = "-q --strict-markers --reuse-db"
+markers = [
+    "integration: tests that need PostgreSQL, Redis or Channels",
+]
+filterwarnings = [
+    "ignore::DeprecationWarning",
+]
+
+[tool.coverage.run]
+branch = true
+source = ["retroville"]
+omit = [
+    "**/migrations/*",
+    "**/admin.py",
+    "manage.py",
+    "retroville/wsgi.py",
+    "retroville/asgi.py",
+    "retroville/runner.py",
+    "retroville/settings/local.py",
+    "retroville/settings/production.py",
+    "retroville/settings/integration.py",
+    "retroville/stories/test/*",
+    "retroville/chat/views.py",
+]
+
+[tool.coverage.report]
+fail_under = 55
+show_missing = true
+skip_covered = true
+
+[tool.mypy]
+python_version = "3.12"
+plugins = ["mypy_django_plugin.main"]
+ignore_missing_imports = true
+check_untyped_defs = true
+warn_unused_ignores = true
+exclude = ["migrations", "docker/legacy", "scripts/matching_algorithym.py"]
+
+[tool.django-stubs]
+django_settings_module = "retroville.settings.test"

@@ -285,7 +285,7 @@
 				],
 				"body": {
 					"mode": "raw",
-					"raw": "{\n\t\"access_token\": \"FRIENDLY\"\n}"
+					"raw": "{\n\t\"access_token\": \"{{access_token}}\"\n}"
 				},
 				"url": {
 					"raw": "{{url}}/api/v1/room/enter/",
@@ -326,7 +326,7 @@
 				],
 				"body": {
 					"mode": "raw",
-					"raw": "{\n\t\"access_token\": \"DFGDFGDFG\"\n}"
+					"raw": "{\n\t\"access_token\": \"{{access_token}}\"\n}"
 				},
 				"url": {
 					"raw": "{{url}}/api/v1/room/update/",

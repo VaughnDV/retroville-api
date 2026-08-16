@@ -1,80 +1,68 @@
 # Retroville API
 
-## Prerequisites
+Spontaneous activity matching and real-time communication for people who liked the same daily stories.
 
-- [Docker](https://docs.docker.com/docker-for-mac/install/)  
-- [Heroku Toolbelt](https://toolbelt.heroku.com/)
+Originally built in 2019, Retroville is a Django API for spontaneous activity matching and real-time communication. In 2026 it was recovered and modernised using characterisation tests, staged framework upgrades, secure configuration, retry-safe background jobs and contemporary CI while retaining its original Git history.
 
-## Local Development
+## Why this project is shown
 
-create a `.env` file in the root directory where `manage.py` lives, and populate the following:
-```DJANGO_SETTINGS_MODULE=retroville.config 
-DJANGO_CONFIGURATION=Local
-DJANGO_SECRET_KEY=Local
-ACCOUNT_SID=
-API_KEY=
-API_KEY_SECRET=
-APP_SID=
-PUSH_CREDENTIAL_SID=
-REDIS_URL=redis://redis_db:6379
-DEBUG=True
-AUTHY_API_KEY=
-NEWS_API_KEY=
-```
+This is not a greenfield demo. It is a 2019 production-style backend (DRF, PostgreSQL, Celery, Redis, Channels, Twilio) brought onto a currently supported stack without pretending it was always modern. The 2019 commits stay in history; the `modernise/showcase` branch is the maintained runtime.
 
-Build for local development:
-```bash
-docker-compose build
-```
+What changed: Python 3.6 / Django 2.1 → Python 3.12 / Django 5.2 LTS, Poetry lockfile, provider fakes, transactional matching, health checks, GitHub Actions, and a multi-stage non-root image.
 
-Start the dev server for local development:
-```bash
-docker-compose up
-```
+## Architecture
 
-Run a command inside the docker container:
+HTTP clients hit Django REST Framework. WebSocket clients hit Channels. PostgreSQL stores users, stories and matches. Redis is the cache, channel layer and Celery broker. Workers ingest daily stories and can create matches off the request path.
+
+See [docs/architecture.md](docs/architecture.md) for the diagram and [docs/decisions/](docs/decisions/) for trade-offs.
+
+## Quick start (offline demo)
+
+No Twilio or News API keys are required.
 
 ```bash
-docker-compose run --rm web [command]
+cp .env.example .env
+make compose-up
 ```
 
+Then:
 
-## Deployment
+- API: http://127.0.0.1:8000/api/docs/
+- Health: http://127.0.0.1:8000/health/live/ and `/health/ready/`
+- Demo login: `owner@example.com` / `password123`
 
-Make sure your changes are committed on Git...
+Example:
 
-Login to Heroku
 ```bash
-heroku login
+TOKEN=$(curl -s -X POST http://127.0.0.1:8000/api-token-auth/ \
+  -H 'Content-Type: application/json' \
+  -d '{"username":"owner@example.com","password":"password123"}' | jq -r .token)
+
+curl -H "Authorization: Token $TOKEN" http://127.0.0.1:8000/api/v1/whoami/
+curl -H "Authorization: Token $TOKEN" http://127.0.0.1:8000/api/v1/match/find/
 ```
 
-Login to Heroku containers
+OpenAPI: http://127.0.0.1:8000/api/schema/
+
+## Quality commands
+
 ```bash
-heroku container:login
+make install          # Poetry + pre-commit
+make lint             # Ruff
+make typecheck        # mypy on the new modules
+make test             # unit + characterisation, no network
+make test-integration # PostgreSQL / Redis / Channels
+make audit            # pip-audit
+make docs             # MkDocs
 ```
 
-Push changes to Heroku STAGE
-```bash
-heroku container:push web --remote stage
-```
+## Limitations and status
 
-Release on Heroku STAGE
-```bash
-heroku container:release web --remote stage
-```
+- Matching story selection is still sampled from the Jaccard intersection, as in 2019.
+- Chat does not replay missed messages after reconnect.
+- Voice calling against live Twilio is optional; the demo mints fake tokens.
+- Historical Git blobs still contain old secrets until the playbook in
+  `docs/security/history-rewrite.md` is run against a backup.
+- Keep the GitHub repository **private** until that audit is complete.
 
-RELEASED!!! :D
-
-## Other 
-
-Sometime you may need to work on the server:
-```bash
-heroku run bash --remote stage
-```
-
-Sometime you may need to see the logs on the server:
-```bash
-heroku logs -t --remote stage
-```
-
-Note that we have two environments, `stage` and `production`
+Licence: MIT. See `SECURITY.md` for reporting.

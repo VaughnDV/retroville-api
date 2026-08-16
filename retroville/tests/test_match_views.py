@@ -1,23 +1,24 @@
-from rest_framework.test import APIRequestFactory
+import json
+import random
+import string
+import time
+from datetime import date
+
+from django.contrib.auth import get_user_model
+from django.db.models import Q
+from django.test import Client, RequestFactory
 from django.urls import reverse
-from django.test import RequestFactory, Client
-from retroville.stories.models import Story, UserReadStory
+from rest_framework.test import APIRequestFactory, APITestCase
+
 from retroville.matching.models import Match, MatchActivity, Room, RoomActivity
 from retroville.matching.views import (
     check_room,
-    exit_room,
-    list_room,
     enter_room,
+    exit_room,
     find_match,
+    list_room,
 )
-import json
-from datetime import date
-from django.contrib.auth import get_user_model
-from rest_framework.test import APITestCase
-import string
-import random
-import time
-from django.db.models import Q
+from retroville.stories.models import Story, UserReadStory
 
 User = get_user_model()
 

@@ -1,36 +1,35 @@
-import os
+"""Wait until PostgreSQL accepts connections. Used by Compose, not the production image."""
+
+from __future__ import annotations
+
 import logging
-from time import time, sleep
-import psycopg2
-check_timeout = os.getenv("POSTGRES_CHECK_TIMEOUT", 30)
-check_interval = os.getenv("POSTGRES_CHECK_INTERVAL", 1)
-interval_unit = "second" if check_interval == 1 else "seconds"
-config = {
-    "dbname": os.getenv("POSTGRES_DB", "postgres"),
-    "user": os.getenv("POSTGRES_USER", "postgres"),
-    "password": os.getenv("POSTGRES_PASSWORD", ""),
-    "host": os.getenv("DATABASE_URL", "postgres")
-}
+import os
+import time
 
-start_time = time()
-logger = logging.getLogger()
-logger.setLevel(logging.INFO)
-logger.addHandler(logging.StreamHandler())
+import psycopg
+
+check_timeout = float(os.getenv("POSTGRES_CHECK_TIMEOUT", "30"))
+check_interval = float(os.getenv("POSTGRES_CHECK_INTERVAL", "1"))
+database_url = os.getenv("DATABASE_URL", "postgres://postgres:@postgres:5432/postgres")
+
+logger = logging.getLogger("wait_for_postgres")
+logging.basicConfig(level=logging.INFO)
 
 
-def pg_isready(host, user, password, dbname):
-    while time() - start_time < check_timeout:
+def ready() -> bool:
+    deadline = time.time() + check_timeout
+    while time.time() < deadline:
         try:
-            conn = psycopg2.connect(**vars())
-            logger.info("Postgres is ready! ✨ 💅")
-            conn.close()
+            with psycopg.connect(database_url, connect_timeout=3) as conn:
+                conn.execute("SELECT 1")
+            logger.info("Postgres is ready")
             return True
-        except psycopg2.OperationalError:
-            logger.info(f"Postgres isn't ready. Waiting for {check_interval} {interval_unit}...")
-            sleep(check_interval)
-
-    logger.error(f"We could not connect to Postgres within {check_timeout} seconds.")
+        except Exception as exc:
+            logger.info("Postgres is not ready (%s); retrying", exc)
+            time.sleep(check_interval)
+    logger.error("Could not connect to Postgres within %s seconds", check_timeout)
     return False
 
 
-pg_isready(**config)
+if __name__ == "__main__":
+    raise SystemExit(0 if ready() else 1)

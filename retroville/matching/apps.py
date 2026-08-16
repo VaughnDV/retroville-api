@@ -1,5 +1,7 @@
 from django.apps import AppConfig
 
 
-class MatchingRoomConfig(AppConfig):
-    name = "matching"
+class MatchingConfig(AppConfig):
+    default_auto_field = "django.db.models.AutoField"
+    name = "retroville.matching"
+    label = "matching"
