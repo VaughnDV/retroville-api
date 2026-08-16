@@ -25,6 +25,7 @@ ENV PYTHONDONTWRITEBYTECODE=1 \
     PORT=8000
 
 RUN apt-get update \
+    && apt-get install -y --no-install-recommends --only-upgrade libgnutls30 libssl3 openssl \
     && apt-get install -y --no-install-recommends libpq5 \
     && rm -rf /var/lib/apt/lists/* \
     && groupadd --system retroville \
