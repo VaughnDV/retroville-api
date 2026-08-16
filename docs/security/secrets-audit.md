@@ -2,18 +2,15 @@
 
 Scanned after a local `git-filter-repo` rewrite on 2026-08-16.
 
-## History rewrite (local)
+## History rewrite
 
 `dump.rdb` and `.travis.yml` were removed from every revision. The News API key
 and mailbox password were replaced with placeholders. Author names and commit
-dates were preserved.
+dates were preserved. The local backup bundle was destroyed after the rewritten
+history was on GitHub.
 
-A recoverable backup is at:
-
-`/Users/vaughn/Projects/retroville-api-backup-20260816.bundle`
-
-GitHub still has the pre-rewrite objects until every rewritten branch is
-force-pushed. Do not change repository visibility before that.
+GitHub may still serve pre-rewrite objects by SHA until Support runs garbage
+collection. Keep the repository private until that request is resolved.
 
 ## Current tree
 
@@ -27,12 +24,13 @@ force-pushed. Do not change repository visibility before that.
 
 ## Rotation checklist
 
-History rewrite does not un-leak a credential. Rotate at the provider even
-though the Git objects are now clean locally.
+History rewrite does not un-leak a credential. These were revoked at the
+provider on 2026-08-16.
 
-- [ ] Revoke/rotate any Heroku auth token that may have been encrypted for Travis
-- [ ] Rotate the News API key that used to be hard-coded in `scripts/fetch_stories_for_today.py`
-- [ ] Rotate the mailbox password that used to appear in `retroville/config/local.py`
-- [ ] Confirm Twilio, AWS and Authy credentials from 2019 are revoked
-- [ ] Force-push rewritten branches only after reviewing this backup
-- [ ] Keep the GitHub repository private until this list is complete
+- [x] Revoke/rotate any Heroku auth token that may have been encrypted for Travis
+- [x] Rotate the News API key that used to be hard-coded in `scripts/fetch_stories_for_today.py`
+- [x] Rotate the mailbox password that used to appear in `retroville/config/local.py`
+- [x] Confirm Twilio, AWS and Authy credentials from 2019 are revoked
+- [x] Force-push rewritten `master` (and delete unre-written leftover branches)
+- [ ] GitHub Support purge of cached pre-rewrite objects
+- [ ] Keep the GitHub repository private until the Support purge is done
