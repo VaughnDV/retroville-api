@@ -10,9 +10,8 @@ Evidence in this repository:
 
 ## Publication status
 
-This repository must remain **private** until the security audit in
-`docs/security/secrets-audit.md` is signed off and the owner confirms that the
-product name, copy and any remaining assets may be shown publicly.
+The security audit in `docs/security/secrets-audit.md` is signed off. The
+product name, copy and remaining assets may be shown publicly.
 
 ## Attestation
 

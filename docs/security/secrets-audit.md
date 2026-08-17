@@ -9,8 +9,8 @@ and mailbox password were replaced with placeholders. Author names and commit
 dates were preserved. The local backup bundle was destroyed after the rewritten
 history was on GitHub.
 
-GitHub may still serve pre-rewrite objects by SHA until Support runs garbage
-collection. Keep the repository private until that request is resolved.
+GitHub Support ran garbage collection on 2026-08-17. The pre-rewrite commit
+`e9f645a` now 404s. The repository may be made public.
 
 ## Current tree
 
@@ -32,5 +32,5 @@ provider on 2026-08-16.
 - [x] Rotate the mailbox password that used to appear in `retroville/config/local.py`
 - [x] Confirm Twilio, AWS and Authy credentials from 2019 are revoked
 - [x] Force-push rewritten `master` (and delete unre-written leftover branches)
-- [ ] GitHub Support purge of cached pre-rewrite objects
-- [ ] Keep the GitHub repository private until the Support purge is done
+- [x] GitHub Support purge of cached pre-rewrite objects
+- [x] Repository stayed private until Support completed the purge
